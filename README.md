@@ -1,1 +1,3 @@
-# CS 262 Predestination Service Repo
+# CS 262 Team G
+
+Predestination Service Repo
