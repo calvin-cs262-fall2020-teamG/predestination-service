@@ -1,6 +1,6 @@
 -- Required SQL tables for the Predestination Service
--- Author: Ethan Walters
--- Date: 10/27/2020
+-- @author: Ethan Walters
+-- @date: 10/27/2020
 
 DROP TABLE IF EXISTS Player;
 DROP TABLE IF EXISTS Game;
