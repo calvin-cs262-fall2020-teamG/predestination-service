@@ -15,6 +15,10 @@ router.use(express.json());
 
 router.get("/", readHelloMessage);
 
+app.use(router);
+app.use(errorHandler);
+app.listen(port, () => console.log(`Listening on port ${port}`));
+
 function errorHandler(err, req, res) {
     if (app.get('env') === "development") {
         console.log(err);
@@ -31,5 +35,5 @@ function returnDataOr404(res, data) {
 }
 
 function readHelloMessage(req, res) {
-    res.send('Hello, CS 262 Monopoly service!');
+    res.send('Hello, Predestination Service!');
 }
