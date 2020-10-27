@@ -1,3 +1,9 @@
+/**
+ * REST-inspired webservice for the Predestination DB
+ * @author: Ethan Walters
+ * @date: 10/27/2020
+ */
+
 const pgp = require('pg-promise')();
 const db = pgp({
     host: "raja.db.elephantsql.com",
@@ -24,14 +30,6 @@ function errorHandler(err, req, res) {
         console.log(err);
     }
     res.sendStatus(err.status || 500);
-}
-
-function returnDataOr404(res, data) {
-    if (data == null) {
-        res.sendStatus(404);
-    } else {
-        res.send(data);
-    }
 }
 
 function readHelloMessage(req, res) {
