@@ -1,6 +1,6 @@
 -- SQL script that implements sample queries for the Predestination database
 -- @author: Ethan Walters
--- @data: 10/29/2020
+-- @date: 10/29/2020
 
 -- Get all Game records
 SELECT *
