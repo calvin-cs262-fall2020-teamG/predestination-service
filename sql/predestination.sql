@@ -9,12 +9,12 @@ DROP TABLE IF EXISTS Clue;
 DROP TABLE IF EXISTS CluePlayer;
 
 CREATE TABLE Player(
-    ID integer PRIMARY KEY,
+    ID SERIAL PRIMARY KEY,
     name varchar(50)
 );
 
 CREATE TABLE Game(
-    ID integer PRIMARY KEY,
+    ID SERIAL PRIMARY KEY,
     gameCode numeric
 );
 
@@ -45,12 +45,12 @@ GRANT SELECT ON Clue TO PUBLIC;
 GRANT SELECT ON CluePlayer TO PUBLIC;
 
 -- Sample data
-INSERT INTO Player VALUES (1, Ethan)
-INSERT INTO Player VALUES (2, Jacob)
-INSERT INTO Player VALUES (3, Nathan)
-INSERT INTO Player VALUES (4, Hayworth)
-INSERT INTO Player VALUES (5, Advait)
+INSERT INTO Player(name) VALUES (Ethan)
+INSERT INTO Player(name) VALUES (Jacob)
+INSERT INTO Player(name) VALUES (Nathan)
+INSERT INTO Player(name) VALUES (Hayworth)
+INSERT INTO Player(name) VALUES (Advait)
 
-INSERT INTO Game VALUES (1, 987929)
-INSERT INTO Game VALUES (2, 239682)
-INSERT INTO Game VALUES (3, 349583)
+INSERT INTO Game(gameCode) VALUES (987929)
+INSERT INTO Game(gameCode) VALUES (239682)
+INSERT INTO Game(gameCode) VALUES (349583)
