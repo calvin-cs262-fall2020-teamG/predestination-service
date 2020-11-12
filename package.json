@@ -1,0 +1,19 @@
+{
+  "name": "predestination-webservice",
+  "version": "1.0.0",
+  "description": "Predestination Webservice",
+  "main": "predestinationService.js",
+  "author": "Ethan Walters",
+  "license": "ISC",
+  "engines": {
+    "node": "12.x"
+  },
+  "scripts": {
+    "start": "node predesinationService.js",
+    "start-direct": "node predestinationDirect.js"
+  },
+  "dependencies": {
+    "express": "^4.17.1",
+    "pg-promise": "^10.5.7"
+  }
+}
