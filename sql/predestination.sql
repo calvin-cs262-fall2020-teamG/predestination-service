@@ -8,30 +8,35 @@ DROP TABLE IF EXISTS PlayerGame;
 DROP TABLE IF EXISTS Clue;
 DROP TABLE IF EXISTS CluePlayer;
 
-CREATE TABLE Player(
+CREATE TABLE Player
+(
     ID SERIAL PRIMARY KEY,
     name varchar(50)
 );
 
-CREATE TABLE Game(
+CREATE TABLE Game
+(
     ID SERIAL PRIMARY KEY,
     gameCode numeric
 );
 
-CREATE TABLE PlayerGame(
+CREATE TABLE PlayerGame
+(
     gameID integer REFERENCES Game(ID),
     playerID integer REFERENCES Player(ID)
 );
 
-CREATE TABLE Clue(
-    ID integer PRIMARY KEY,
+CREATE TABLE Clue
+(
+    ID SERIAL PRIMARY KEY,
     description text,
     location point,
     points numeric,
     gameID integer REFERENCES Game(ID)
 );
 
-CREATE TABLE CluePlayer(
+CREATE TABLE CluePlayer
+(
     ClueID integer REFERENCES Clue(ID),
     playerID integer REFERENCES Player(ID),
     time timestamp
@@ -45,12 +50,46 @@ GRANT SELECT ON Clue TO PUBLIC;
 GRANT SELECT ON CluePlayer TO PUBLIC;
 
 -- Sample data
-INSERT INTO Player(name) VALUES (Ethan)
-INSERT INTO Player(name) VALUES (Jacob)
-INSERT INTO Player(name) VALUES (Nathan)
-INSERT INTO Player(name) VALUES (Hayworth)
-INSERT INTO Player(name) VALUES (Advait)
+INSERT INTO Player
+    (name)
+VALUES
+    (Ethan)
+INSERT INTO Player
+    (name)
+VALUES
+    (Jacob)
+INSERT INTO Player
+    (name)
+VALUES
+    (Nathan)
+INSERT INTO Player
+    (name)
+VALUES
+    (Hayworth)
+INSERT INTO Player
+    (name)
+VALUES
+    (Advait)
 
-INSERT INTO Game(gameCode) VALUES (987929)
-INSERT INTO Game(gameCode) VALUES (239682)
-INSERT INTO Game(gameCode) VALUES (349583)
+INSERT INTO Game
+    (gameCode)
+VALUES
+    (987929)
+INSERT INTO Game
+    (gameCode)
+VALUES
+    (239682)
+INSERT INTO Game
+    (gameCode)
+VALUES
+    (349583)
+
+INSERT INTO Clue
+    (description)
+VALUES("The better dining hall")
+INSERT INTO Clue
+    (location)
+VALUES(50, 50)
+INSERT INTO Clue
+    (points)
+VALUES(10)
