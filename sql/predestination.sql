@@ -50,46 +50,46 @@ GRANT SELECT ON Clue TO PUBLIC;
 GRANT SELECT ON CluePlayer TO PUBLIC;
 
 -- Sample data
-INSERT INTO Player
-    (name)
-VALUES
-    (Ethan)
-INSERT INTO Player
-    (name)
-VALUES
-    (Jacob)
-INSERT INTO Player
-    (name)
-VALUES
-    (Nathan)
-INSERT INTO Player
-    (name)
-VALUES
-    (Hayworth)
-INSERT INTO Player
-    (name)
-VALUES
-    (Advait)
+INSERT INTO Player (name) 
+VALUES(Ethan);
 
-INSERT INTO Game
-    (gameCode)
-VALUES
-    (987929)
-INSERT INTO Game
-    (gameCode)
-VALUES
-    (239682)
-INSERT INTO Game
-    (gameCode)
-VALUES
-    (349583)
 
-INSERT INTO Clue
-    (description)
-VALUES("The better dining hall")
-INSERT INTO Clue
-    (location)
-VALUES(50, 50)
-INSERT INTO Clue
-    (points)
-VALUES(10)
+-- INSERT INTO Player
+--     (name)
+-- VALUES
+--     (Jacob)
+-- INSERT INTO Player
+--     (name)
+-- VALUES
+--     (Nathan)
+-- INSERT INTO Player
+--     (name)
+-- VALUES
+--     (Hayworth)
+-- INSERT INTO Player
+--     (name)
+-- VALUES
+--     (Advait)
+
+-- INSERT INTO Game
+--     (gameCode)
+-- VALUES
+--     (987929)
+-- INSERT INTO Game
+--     (gameCode)
+-- VALUES
+--     (239682)
+-- INSERT INTO Game
+--     (gameCode)
+-- VALUES
+--     (349583)
+
+-- INSERT INTO Clue
+--     (description)
+-- VALUES("The better dining hall")
+-- INSERT INTO Clue
+--     (location)
+-- VALUES(50, 50)
+-- INSERT INTO Clue
+--     (points)
+-- VALUES(10)
