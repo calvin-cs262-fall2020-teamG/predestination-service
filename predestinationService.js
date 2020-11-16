@@ -54,3 +54,13 @@ function readClues(req, res, next) {
         next(err);
     })
 }
+
+function readClue(req, res, next) {
+    db.oneOrNone('SELECT * FROM Clue WHERE id=${id}', req.params)
+    .then(data => {
+        returnDataOr404(res, data);
+    })
+    .catch(err => {
+        next(err);
+    })
+};
