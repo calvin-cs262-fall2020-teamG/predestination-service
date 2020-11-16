@@ -20,6 +20,7 @@ const router = express.Router();
 router.use(express.json());
 
 router.get("/", readHelloMessage);
+router.get("/clues", readClues);
 
 app.use(router);
 app.use(errorHandler);
@@ -34,4 +35,14 @@ function errorHandler(err, req, res) {
 
 function readHelloMessage(req, res) {
     res.send('Hello, Predestination Service!');
+}
+
+function readClues(req, res, next) {
+    db.many("SELECT * FROM Clue")
+    .then(data => {
+        res.send(data);
+    })
+    .catch(err => {
+        next(err);
+    })
 }
