@@ -1,6 +1,6 @@
 -- Required SQL tables for the Predestination Service
 -- @author: Ethan Walters
--- @date: 10/27/2020
+-- @date: 11/16/2020
 
 DROP TABLE IF EXISTS Player;
 DROP TABLE IF EXISTS Game;
@@ -17,7 +17,7 @@ CREATE TABLE Player
 CREATE TABLE Game
 (
     ID SERIAL PRIMARY KEY,
-    gameCode numeric
+    gameCode integer
 );
 
 CREATE TABLE PlayerGame
@@ -48,48 +48,3 @@ GRANT SELECT ON Game TO PUBLIC;
 GRANT SELECT ON PlayerGame TO PUBLIC;
 GRANT SELECT ON Clue TO PUBLIC;
 GRANT SELECT ON CluePlayer TO PUBLIC;
-
--- Sample data
-INSERT INTO Player
-    (name)
-VALUES
-    (Ethan)
-INSERT INTO Player
-    (name)
-VALUES
-    (Jacob)
-INSERT INTO Player
-    (name)
-VALUES
-    (Nathan)
-INSERT INTO Player
-    (name)
-VALUES
-    (Hayworth)
-INSERT INTO Player
-    (name)
-VALUES
-    (Advait)
-
-INSERT INTO Game
-    (gameCode)
-VALUES
-    (987929)
-INSERT INTO Game
-    (gameCode)
-VALUES
-    (239682)
-INSERT INTO Game
-    (gameCode)
-VALUES
-    (349583)
-
-INSERT INTO Clue
-    (description)
-VALUES("The better dining hall")
-INSERT INTO Clue
-    (location)
-VALUES(50, 50)
-INSERT INTO Clue
-    (points)
-VALUES(10)
