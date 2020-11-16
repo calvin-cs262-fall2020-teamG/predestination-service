@@ -33,6 +33,14 @@ function errorHandler(err, req, res) {
     res.sendStatus(err.status || 500);
 }
 
+function returnDataOr404(res, data) {
+    if (data == null) {
+        res.sendStatus(404);
+    } else {
+        res.send(data);
+    }
+}
+
 function readHelloMessage(req, res) {
     res.send('Hello, Predestination Service!');
 }
