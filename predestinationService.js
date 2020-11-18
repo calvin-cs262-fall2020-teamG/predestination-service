@@ -13,9 +13,13 @@ const db = pgp({
     password: process.env.PASSWORD
 });
 
+/** Setup express server */
 const express = require('express');
 const app = express();
+/** Check port in environment variable first, otherwise run on 5000 */
 const port = process.env.PORT || 3000;
+app.listen(port, () => console.log(`Listening on port ${port}`));
+
 const router = express.Router();
 router.use(express.json());
 
@@ -26,7 +30,7 @@ router.get("/clues/:id", readClue);
 
 app.use(router);
 app.use(errorHandler);
-app.listen(port, () => console.log(`Listening on port ${port}`));
+
 
 function errorHandler(err, req, res) {
     if (app.get('env') === "development") {
