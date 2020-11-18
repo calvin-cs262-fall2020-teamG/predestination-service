@@ -19,6 +19,7 @@ const port = process.env.PORT || 3000;
 const router = express.Router();
 router.use(express.json());
 
+/** Setup express routes */
 router.get("/", readHelloMessage);
 router.get("/clues", readClues);
 router.get("/clues/:id", readClue);
@@ -34,6 +35,7 @@ function errorHandler(err, req, res) {
     res.sendStatus(err.status || 500);
 }
 
+/** If data isn't found return 404 otherwise, send required data */
 function returnDataOr404(res, data) {
     if (data == null) {
         res.sendStatus(404);
@@ -42,10 +44,12 @@ function returnDataOr404(res, data) {
     }
 }
 
+/** Sends a simple hello message - for testing */
 function readHelloMessage(req, res) {
     res.send('Hello, Predestination Service!');
 }
 
+/** Reads and returns all clues in the Clue table */
 function readClues(req, res, next) {
     db.many("SELECT * FROM Clue")
     .then(data => {
@@ -56,6 +60,7 @@ function readClues(req, res, next) {
     })
 }
 
+/** Reads and returns a clue by its ID */
 function readClue(req, res, next) {
     db.oneOrNone('SELECT * FROM Clue WHERE id=${id}', req.params)
     .then(data => {
