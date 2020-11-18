@@ -21,6 +21,7 @@ router.use(express.json());
 
 router.get("/", readHelloMessage);
 router.get("/clues", readClues);
+router.get("/clues/:id", readClue);
 
 app.use(router);
 app.use(errorHandler);
