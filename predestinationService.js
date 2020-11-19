@@ -16,7 +16,7 @@ const db = pgp({
 /** Setup express server */
 const express = require('express');
 const app = express();
-/** Check port in environment variable first, otherwise run on 5000 */
+/** Check port in environment variable first, otherwise run on 3000 */
 const port = process.env.PORT || 3000;
 app.listen(port, () => console.log(`Listening on port ${port}`));
 
