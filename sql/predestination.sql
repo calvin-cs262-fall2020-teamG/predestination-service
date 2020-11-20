@@ -11,7 +11,8 @@ DROP TABLE IF EXISTS CluePlayer;
 CREATE TABLE Player
 (
     ID SERIAL PRIMARY KEY,
-    name varchar(50)
+    name varchar(50),
+    profilePictureURL varchar(300),
 );
 
 CREATE TABLE Game

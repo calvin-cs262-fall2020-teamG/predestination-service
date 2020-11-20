@@ -14,28 +14,59 @@ const db = pgp({
 });
 
 /** Setup express server */
+
 const express = require('express');
 const app = express();
+
+
 /** Check port in environment variable first, otherwise run on 3000 */
 const port = process.env.PORT || 3000;
 app.listen(port, () => console.log(`Listening on port ${port}`));
+
+/* Game Server Code
+ * @author: Jacob Brink
+ * 
+ * Completed: 
+ *  - clients can join game and get current game state
+ *  - clients can update others
+ * 
+ * Todo:
+ *  - finish joinGame database selection to retreive player data along with a sum of their points
+ *  - handle player quitting
+ *  - test with and connect to client side
+ */
+
+
+const server = require('http').createServer(app);
+const options = {};
+const io = require('socket.io')(server, options);
+
+io.on('connection', socket => {
+    
+    socket.on('join-session', (gameCode, playerID) => {
+        joinGame(socket, gameCode, playerID);
+    });
+    
+    // updates all players in a game sesion with new information
+    socket.on('found-clue', (gameCode, playerID, clueID, timeStamp) => {
+        socket.to(gameCode).emit('update', playerID, clueID, timeStamp);
+    });
+
+});
+
+/* joinGame prepares player for game by giving current snapshot of game to client and subscribing them to the room identified by the gameCode
+ */
+const joinGame = async (socket, gameCode, playerID) => {
+    const data = await db.many(`SELECT PlayerID, name, profilePictureURL, points FROM PlayerGame, Player, CluePlayer, Clue WHERE playerID=Player.ID AND gameID=${gameCode} AND Clue.gameID=${gameCode}`); //todo
+    socket.emit('players-snapshot', data);
+    socket.join(gameCode);
+}
 
 const router = express.Router();
 router.use(express.json());
 
 /** Setup express routes */
-router.get("/", readHelloMessage);
-router.get("/clues", readClues);
-router.get("/clues/:clueid", readClue);
-router.get("/user/:googleid/signin/", signInUser);
-router.get("/user/:googleid/profile/", getUserData);
-router.get("/game/:gameid/players", getGamePlayers);
-router.get("/game/:gameid/seeker/:googleid/clues", getPlayerClues);
-router.get("/game/:gameid/seeker/:googleid/addpoints/:clueid/:time", updatePlayerClues);
 
-
-app.use(router);
-app.use(errorHandler);
 
 
 function errorHandler(err, req, res) {
@@ -134,3 +165,18 @@ function readClue(req, res, next) {
         next(err);
     })
 };
+
+router.get("/", readHelloMessage);
+router.get("/clues", readClues);
+router.get("/clues/:clueid", readClue);
+router.get("/user/:googleid/signin/", signInUser);
+router.get("/user/:googleid/profile/", getUserData);
+router.get("/game/:gameid/players", getGamePlayers);
+router.get("/game/:gameid/seeker/:googleid/clues", getPlayerClues);
+router.get("/game/:gameid/seeker/:googleid/addpoints/:clueid/:time", updatePlayerClues);
+
+
+
+
+app.use(router);
+app.use(errorHandler);
