@@ -39,7 +39,8 @@ CREATE TABLE CluePlayer
 (
     ClueID integer REFERENCES Clue(ID),
     playerID integer REFERENCES Player(ID),
-    time timestamp
+    time timestamp,
+    PRIMARY KEY (ClueID, playerID)
 );
 
 -- Give required permissions
