@@ -6,8 +6,8 @@
 
 const pgp = require('pg-promise')();
 const db = pgp({
-    host: "raja.db.elephantsql.com",
-    port: 5432,
+    host: process.env.DB_SERVER,
+    port: process.env.DB_PORT,
     database: process.env.USER,
     user: process.env.USER,
     password: process.env.PASSWORD
