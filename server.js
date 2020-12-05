@@ -17,24 +17,24 @@ const app = express();
 const server = require("http").createServer(app);
 const io = require("socket.io").listen(server);
 const port = 4000;
-
 server.listen(port, () => console.log("server is running on port:" + port));
 
-io.on("connection", socket => {
+export function initializeServer() {
+    io.on("connection", socket => {
 
-    console.log("a user connected");
+        console.log("a user connected");
 
-    socket.on('join-session', (gameCode, playerID) => {
-        joinGame(socket, gameCode, playerID);
-    });
+        socket.on('join-session', (gameCode, playerID) => {
+            joinGame(socket, gameCode, playerID);
+        });
 
-    // updates all players in a game session with new information when a player finds a clue
-    socket.on('found-clue', (gameCode, playerID, clueID, timeStamp) => {
-        socket.to(gameCode.emit('update', playerID, clueID, timeStamp));
+        // updates all players in a game session with new information when a player finds a clue
+        socket.on('found-clue', (gameCode, playerID, clueID, timeStamp) => {
+            socket.to(gameCode.emit('update', playerID, clueID, timeStamp));
+        })
     })
-})
 
-
+}
 
 /*
  * joinGame prepares player for game by giving current snapshot of game to

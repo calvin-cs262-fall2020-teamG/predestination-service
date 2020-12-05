@@ -4,6 +4,8 @@
  * @date: 10/27/2020
  */
 
+import { initializeServer } from '/server.js';
+
 const pgp = require('pg-promise')();
 const db = pgp({
     host: process.env.DB_SERVER,
@@ -140,3 +142,5 @@ router.get("/user/:googleid/profile/", getUserData);
 router.get("/game/:gameid/players", getGamePlayers);
 router.get("/game/:gameid/seeker/:googleid/clues", getPlayerClues);
 router.get("/game/:gameid/seeker/:googleid/addpoints/:clueid/:time", updatePlayerClues);
+
+initializeServer();
