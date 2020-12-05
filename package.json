@@ -1,4 +1,5 @@
 {
+  "type": "module",
   "name": "predestination-webservice",
   "version": "1.0.0",
   "description": "Predestination Webservice",
