@@ -1,0 +1,5 @@
+1. Initiate connection (log to server and client)
+    - this will open a socket and keep it open for real-time data communication
+3. Give CluePlayer table data (like a snapshot) to player when they first join a game
+    - this contains the game state (profile, points, etc.) identified by the game code
+4. Listen for updates
