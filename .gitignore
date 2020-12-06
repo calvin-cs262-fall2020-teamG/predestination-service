@@ -3,3 +3,6 @@ node_modules
 
 # WebStorm files
 .idea/*
+
+# Local heroku config vars
+.env
