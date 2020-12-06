@@ -16,20 +16,24 @@ const db = pgp({
 /** Setup express server */
 const express = require('express');
 const app = express();
+const port = process.env.PORT || 3000;
 const router = express.Router();
 router.use(express.json());
 
+router.get("/", readHelloMessage);
+router.get("/clues", readClues);
+router.get("/clues/:clueid", readClue);
+router.get("/user/:googleid/signin/", signInUser);
+router.get("/user/:googleid/profile/", getUserData);
+router.get("/game/:gameid/players", getGamePlayers);
+router.get("/game/:gameid/seeker/:googleid/clues", getPlayerClues);
+router.get("/game/:gameid/seeker/:googleid/addpoints/:clueid/:time", updatePlayerClues);
+
+router.get("/socketConnection", socketConnection)
+
 app.use(router);
 app.use(errorHandler);
-
-/** Check port in environment variable first, otherwise run on 3000 */
-const port = process.env.PORT || 3000;
 app.listen(port, () => console.log(`Listening on port ${port}`));
-
-// Sends a simple hello message - for testing
-function readHelloMessage(req, res) {
-    res.send('Hello, Predestination Service!');
-}
 
 function errorHandler(err, req, res) {
     if (app.get('env') === "development") {
@@ -50,6 +54,11 @@ function returnDataOr404(res, data) {
     }
 }
 
+// Sends a simple hello message - for testing
+function readHelloMessage(req, res) {
+    res.send('Hello, Predestination Service!');
+}
+
 /*
 signInUser updates the Player table with corresponding Google account data
 Postcondition: if user does not exist in table, add user
@@ -68,7 +77,7 @@ getUserData retrieves Google account data from the Player data
 @params: user ID
 returns: username, photo URL
  */
-const getUserData = async  (req, res, next) => {
+const getUserData = async (req, res, next) => {
     try {
         const data = await db.oneOrNone(
             `SELECT * FROM Player
@@ -166,14 +175,4 @@ const joinGame = async (socket, gameCode, playerID) => {
     socket.join(gameCode);
 }
 
-router.get("/", readHelloMessage);
-router.get("/clues", readClues);
-router.get("/clues/:clueid", readClue);
-router.get("/user/:googleid/signin/", signInUser);
-router.get("/user/:googleid/profile/", getUserData);
-router.get("/game/:gameid/players", getGamePlayers);
-router.get("/game/:gameid/seeker/:googleid/clues", getPlayerClues);
-router.get("/game/:gameid/seeker/:googleid/addpoints/:clueid/:time", updatePlayerClues);
-
-router.get("/socketConnection", socketConnection)
 
