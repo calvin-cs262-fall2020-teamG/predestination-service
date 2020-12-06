@@ -22,11 +22,10 @@ const app = require('express')();
 const http = require('http').createServer(app);
 const io = require('socket.io')(http);
 
-const socketPort = 3000;
-const webPort = 3001;
+const port = process.env.PORT || 3000;
 
-http.listen(socketPort, () => {
-  console.log(`listening on *:${socketPort}`);
+http.listen(port, () => {
+  console.log(`listening on *:${port}`);
 });
 
 io.on('connect', (socket) => {
