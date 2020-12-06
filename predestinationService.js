@@ -23,6 +23,8 @@ const http = require('http').createServer(app);
 const io = require('socket.io')(http);
 
 const socketPort = 3000;
+const webPort = 3001;
+
 http.listen(socketPort, () => {
   console.log(`listening on *:${socketPort}`);
 });
@@ -40,11 +42,9 @@ router.get("/", readHelloMessage);
 router.get("/clues", readClues);
 router.get("/clues/:id", readClue);
 
-const webPort = 3001;
-
 app.use(router);
 app.use(errorHandler);
-app.listen(webPort, () => console.log(`Listening on port ${webPort}`));
+//app.listen(webPort, () => console.log(`Listening on port ${webPort}`));
 
 function errorHandler(err, req, res) {
     if (app.get('env') === "development") {
