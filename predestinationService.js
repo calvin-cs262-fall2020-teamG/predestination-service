@@ -5,7 +5,6 @@
  */
 
 
-console.log(process.env.USER);
 const pgp = require('pg-promise')();
 const db = pgp({
     host: process.env.DB_SERVER,
@@ -15,10 +14,24 @@ const db = pgp({
     password: process.env.DB_PASSWORD
 });
 
+/** Setup socket.io server */
+
 /** Setup express server */
 const express = require('express');
-const app = express();
-const port = process.env.PORT || 3000;
+const app = require('express')();
+const http = require('http').createServer(app);
+const io = require('socket.io')(http);
+
+const socketPort = 3000;
+http.listen(socketPort, () => {
+  console.log(`listening on *:${socketPort}`);
+});
+
+io.on('connect', (socket) => {
+    socket.emit('duh', 'aaa');
+    console.log("Connected!");
+});
+
 const router = express.Router();
 router.use(express.json());
 
@@ -27,9 +40,11 @@ router.get("/", readHelloMessage);
 router.get("/clues", readClues);
 router.get("/clues/:id", readClue);
 
+const webPort = 3001;
+
 app.use(router);
 app.use(errorHandler);
-app.listen(port, () => console.log(`Listening on port ${port}`));
+app.listen(webPort, () => console.log(`Listening on port ${webPort}`));
 
 function errorHandler(err, req, res) {
     if (app.get('env') === "development") {
