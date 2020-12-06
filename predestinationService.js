@@ -15,25 +15,27 @@ const db = pgp({
 
 /** Setup express server */
 const express = require('express');
-const app = express();
+const app = require('express')();
+const http = require('http').createServer(app);
+const io = require('socket.io')(http);
+
 const port = process.env.PORT || 3000;
+
+http.listen(port, () => {
+    console.log(`listening on *:${port}`);
+});
+
+io.on('connect', (socket) => {
+    socket.emit('duh', 'aaa',);
+    console.log("Connected!");
+})
+
 const router = express.Router();
 router.use(express.json());
 
-router.get("/", readHelloMessage);
-router.get("/clues", readClues);
-router.get("/clues/:clueid", readClue);
-router.get("/user/:googleid/signin/", signInUser);
-router.get("/user/:googleid/profile/", getUserData);
-router.get("/game/:gameid/players", getGamePlayers);
-router.get("/game/:gameid/seeker/:googleid/clues", getPlayerClues);
-router.get("/game/:gameid/seeker/:googleid/addpoints/:clueid/:time", updatePlayerClues);
-
-router.get("/socketConnection", socketConnection)
-
 app.use(router);
 app.use(errorHandler);
-app.listen(port, () => console.log(`Listening on port ${port}`));
+// app.listen(port, () => console.log(`Listening on port ${port}`));
 
 function errorHandler(err, req, res) {
     if (app.get('env') === "development") {
@@ -42,10 +44,7 @@ function errorHandler(err, req, res) {
     res.sendStatus(err.status || 500);
 }
 
-/*
-returnDataOr404 sends required data unless its state is null
-@params: data-
- */
+/** If data isn't found return 404 otherwise, send required data */
 function returnDataOr404(res, data) {
     if (data == null) {
         res.sendStatus(404);
@@ -54,9 +53,31 @@ function returnDataOr404(res, data) {
     }
 }
 
-// Sends a simple hello message - for testing
+/** Sends a simple hello message - for testing */
 function readHelloMessage(req, res) {
     res.send('Hello, Predestination Service!');
+}
+
+/** Reads and returns all clues in the Clue table */
+function readClues(req, res, next) {
+    db.many("SELECT * FROM Clue")
+        .then(data => {
+            res.send(data);
+        })
+        .catch(err => {
+            next(err);
+        })
+}
+
+/** Reads and returns a clue by its ID */
+function readClue(req, res, next) {
+    db.oneOrNone('SELECT * FROM Clue WHERE id=${id}', req.params)
+        .then(data => {
+            returnDataOr404(res, data);
+        })
+        .catch(err => {
+            next(err);
+        })
 }
 
 /*
@@ -119,52 +140,6 @@ const getGamePlayers = async (req, res, next) => {
     }
 }
 
-// Reads and returns all clues in the Clue table
-function readClues(req, res, next) {
-    db.many("SELECT * FROM Clue")
-        .then(data => {
-            res.send(data);
-        })
-        .catch(err => {
-            next(err);
-        })
-}
-
-// Reads and returns a clue by its ID
-function readClue(req, res, next) {
-    db.oneOrNone('SELECT * FROM Clue WHERE id=${clueid}', req.params)
-        .then(data => {
-            returnDataOr404(res, data);
-        })
-        .catch(err => {
-            next(err);
-        });
-}
-
-const server = require("http").createServer(app);
-const io = require("socket.io").listen(server);
-
-function socketConnection() {
-    initializeServer();
-}
-
-function initializeServer() {
-    io.on("connection", socket => {
-
-        console.log("a user connected");
-
-        socket.on('join-session', (gameCode, playerID) => {
-            joinGame(socket, gameCode, playerID);
-        });
-
-        // updates all players in a game session with new information when a player finds a clue
-        socket.on('found-clue', (gameCode, playerID, clueID, timeStamp) => {
-            socket.to(gameCode.emit('update', playerID, clueID, timeStamp));
-        })
-    })
-
-}
-
 /*
  * joinGame prepares player for game by giving current snapshot of game to
  * client and subscribing them to the room identified by the gameCode
@@ -175,4 +150,12 @@ const joinGame = async (socket, gameCode, playerID) => {
     socket.join(gameCode);
 }
 
-
+/** Setup express routes */
+router.get("/", readHelloMessage);
+router.get("/clues", readClues);
+router.get("/clues/:id", readClue);
+router.get("/user/:googleid/signin/", signInUser);
+router.get("/user/:googleid/profile/", getUserData);
+router.get("/game/:gameid/players", getGamePlayers);
+router.get("/game/:gameid/seeker/:googleid/clues", getPlayerClues);
+router.get("/game/:gameid/seeker/:googleid/addpoints/:clueid/:time", updatePlayerClues);
