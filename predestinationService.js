@@ -4,8 +4,6 @@
  * @date: 10/27/2020
  */
 
-import { initializeServer } from '/server.js';
-
 const pgp = require('pg-promise')();
 const db = pgp({
     host: process.env.DB_SERVER,
@@ -134,8 +132,38 @@ function readClue(req, res, next) {
         });
 }
 
-function socketConnection(req, res, next) {
+const server = require("http").createServer(app);
+const io = require("socket.io").listen(server);
+
+function socketConnection() {
     initializeServer();
+}
+
+function initializeServer() {
+    io.on("connection", socket => {
+
+        console.log("a user connected");
+
+        socket.on('join-session', (gameCode, playerID) => {
+            joinGame(socket, gameCode, playerID);
+        });
+
+        // updates all players in a game session with new information when a player finds a clue
+        socket.on('found-clue', (gameCode, playerID, clueID, timeStamp) => {
+            socket.to(gameCode.emit('update', playerID, clueID, timeStamp));
+        })
+    })
+
+}
+
+/*
+ * joinGame prepares player for game by giving current snapshot of game to
+ * client and subscribing them to the room identified by the gameCode
+ */
+const joinGame = async (socket, gameCode, playerID) => {
+    const data = await db.many(`SELECT PlayerID, name, profilePictureURL, points FROM PlayerGame, Player, CluePlayer, Clue WHERE playerID=Player.ID AND gameID=${gameCode} AND Clue.gameID=${gameCode}`); //todo
+    socket.emit('players-snapshot', data);
+    socket.join(gameCode);
 }
 
 router.get("/", readHelloMessage);
