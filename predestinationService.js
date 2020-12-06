@@ -154,7 +154,7 @@ const joinGame = async (socket, gameCode, playerID) => {
 router.get("/", readHelloMessage);
 router.get("/clues", readClues);
 router.get("/clues/:id", readClue);
-router.post("/user/:googleid/signin/", signInUser);
+router.post("/login", signInUser);
 router.get("/user/:googleid/profile/", getUserData);
 router.get("/game/:gameid/players", getGamePlayers);
 router.get("/game/:gameid/seeker/:googleid/clues", getPlayerClues);
