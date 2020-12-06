@@ -4,12 +4,14 @@
  * @date: 10/27/2020
  */
 
+
+console.log(process.env.USER);
 const pgp = require('pg-promise')();
 const db = pgp({
     host: process.env.DB_SERVER,
     port: process.env.DB_PORT,
-    database: process.DB_USER,
-    user: process.env.DB_USER,
+    database: process.env.USER,
+    user: process.env.USER,
     password: process.env.DB_PASSWORD
 });
 

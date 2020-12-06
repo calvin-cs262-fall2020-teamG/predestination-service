@@ -14,6 +14,6 @@
   },
   "dependencies": {
     "express": "^4.17.1",
-    "pg-promise": "^10.7.5"
+    "pg-promise": "^10.8.1"
   }
 }
