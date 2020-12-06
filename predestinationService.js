@@ -27,7 +27,7 @@ http.listen(port, () => {
 
 io.on('connect', (socket) => {
     socket.emit('duh', 'aaa',);
-    console.log("Connected!");
+    console.log("Made a socket connection", socket.id);
 })
 
 const router = express.Router();
