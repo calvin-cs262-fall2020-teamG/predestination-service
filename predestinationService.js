@@ -4,7 +4,7 @@
  * @date: 10/27/2020
  */
 
-// import { initializeServer } from '/server.js';
+import { initializeServer } from '/server.js';
 
 const pgp = require('pg-promise')();
 const db = pgp({
@@ -134,6 +134,10 @@ function readClue(req, res, next) {
         });
 }
 
+function socketConnection(req, res, next) {
+    initializeServer();
+}
+
 router.get("/", readHelloMessage);
 router.get("/clues", readClues);
 router.get("/clues/:clueid", readClue);
@@ -143,4 +147,5 @@ router.get("/game/:gameid/players", getGamePlayers);
 router.get("/game/:gameid/seeker/:googleid/clues", getPlayerClues);
 router.get("/game/:gameid/seeker/:googleid/addpoints/:clueid/:time", updatePlayerClues);
 
-// initializeServer();
+router.get("/socketConnection", socketConnection)
+
