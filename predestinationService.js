@@ -152,6 +152,7 @@ const joinGame = async (socket, gameCode, playerID) => {
 
 app.get('https://predestination-service.herokuapp.com/userdata', (req, res, next) => {
     console.log(req.params.id + 'Request received!')
+    res.send(req.params.id);
 })
 
 /** Setup express routes */
