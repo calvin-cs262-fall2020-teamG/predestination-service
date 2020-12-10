@@ -63,7 +63,16 @@ async function deliverSnapshot (socket, gameCode) {
     socket.emit('players-snapshot', gameLog, playerData, clueData);
 }
 
+function addClue(gameCode, playerID, clueID, timeStamp) {
+    // TODO: insert relevant data into the CluePlayer database
+}
+
 async function getGameLog(gameCode) {
+    try {
+	
+    } catch (err) {
+	
+    };
     // TODO: should return a list of objects each with the following format
     // {
     //    playerID: STRING,
