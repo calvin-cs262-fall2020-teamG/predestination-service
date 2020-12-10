@@ -26,9 +26,72 @@ http.listen(port, () => {
 });
 
 io.on('connect', (socket) => {
-    socket.emit('duh', 'aaa',);
+
+    socket.on('join-session', (gameCode, playerID) => {
+
+	console.log(`Player ${playerID} joined a game with game code ${gameCode}!`);
+	
+	// subscribe socket to given gameCode
+	socket.join(gameCode);
+
+	// send player join event to all other players in the same room
+	socket.to(gameCode).emit('new-player', playerID);
+
+	
+	
+	// give new player a snapshot of the current game
+	socket.emit('players-snapshot', gameLog, playerData, clueData);
+
+	// when this socket gets a clue, update all others
+	socket.on('update', (clueID, timeStamp) => {
+	    console.log(`Player ${playerID} found clue ${clueID}! Congratulations!`);
+	    socket.to(gameCode).emit('update', playerID, clueID, timeStamp);
+	});
+	
+    });
+    
     console.log("Made a socket connection", socket.id);
-})
+    
+});
+
+// delivers game snapshot to new players
+async function deliverSnapshot (socket, gameCode) => {
+    const await gameLog = getGameLog(gameCode);
+    const await playerData = getPlayerData(gameCode);
+    const await clueData = getClueData(gameCode);
+    socket.emit('players-snapshot', gameLog, playerData, clueData);
+}
+
+async function getGameLog(gameCode) {
+    // TODO: should return a list of objects each with the following format
+    // {
+    //    playerID: STRING,
+    //    clueID: INTEGER,
+    //    timeStamp: MS SINCE EPOCH,
+    // }
+    return [];
+}
+
+async function getPlayerData(gameCode) {
+    // TODO: should return a list of players each with the following format
+    // {
+    //    playerID: STRING,
+    //    profileImageURL: STRING,
+    //    displayName: STRING,
+    // }
+    return [];
+}
+
+async function getClueData(gameCode) {
+    // TODO: should return a list of clues each with the following format
+    // {
+    //    clueID: STRING,
+    //    Latitude: DOUBLE,
+    //    Longitude: DOUBLE,
+    //    description: STRING,
+    // }
+    return [];
+}
 
 const router = express.Router();
 router.use(express.json());
