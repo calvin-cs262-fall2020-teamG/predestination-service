@@ -241,6 +241,7 @@ router.get("/", readHelloMessage);
 router.get("/clues", readClues);
 router.get("/clues/:id", readClue);
 router.post('/login', createUser);
+router.get('/game/playerdata', getPlayerData)
 
 //router.get("/user/:googleid/signin/", signInUser);
 //router.get("/user/:googleid/profile/", getUserData);
