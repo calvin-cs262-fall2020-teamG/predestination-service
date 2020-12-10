@@ -82,14 +82,14 @@ async function getGameLog(gameCode) {
     return [];
 }
 
-async function getPlayerData(gameCode) {
-    // TODO: should return a list of players each with the following format
-    // {
-    //    playerID: STRING,
-    //    profileImageURL: STRING,
-    //    displayName: STRING,
-    // }
-    return [];
+async function getPlayerData(gameCode, req, res, next) {
+    db.many(`SELECT * FROM Player`)
+        .then(data => {
+            res.send(data);
+        })
+        .catch(err => {
+            next(err);
+        });
 }
 
 async function getClueData(gameCode) {
@@ -152,7 +152,6 @@ function readClue(req, res, next) {
             next(err);
         })
 }
-
 
 
 /*
