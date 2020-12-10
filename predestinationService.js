@@ -37,7 +37,8 @@ io.on('connect', (socket) => {
 	// send player join event to all other players in the same room
 	socket.to(gameCode).emit('new-player', playerID);
 
-	
+	// show new player how the game is currently
+	deliverSnapshot(socket, gameCode);
 	
 	// give new player a snapshot of the current game
 	socket.emit('players-snapshot', gameLog, playerData, clueData);
