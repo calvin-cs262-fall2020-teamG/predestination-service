@@ -219,7 +219,7 @@ function createUser(req, res, next) {
     const name = req.body.name;
     const profilePictureURL = req.body.profilePictureURL;
     console.log(googleid, name, profilePictureURL)
-    db.one(`INSERT INTO Player(ID, name, "profilePictureURL") VALUES ($1, $2, $3)`, [googleid, name, profilePictureURL]).then(
+    db.one(`INSERT INTO Player(ID, name, "profilePictureURL") VALUES ($1, $2, $3) ON DUPLICATE KEY UPDATE name=$2, "profilePictureURL"=$3`, [googleid, name, profilePictureURL]).then(
         data => {
             res.send(data);
         }
