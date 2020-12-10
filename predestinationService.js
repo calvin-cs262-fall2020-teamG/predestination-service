@@ -30,12 +30,10 @@ io.on('connect', (socket) => {
     socket.on('join-session', (gameCode, playerID) => {
 
 	console.log(`Player ${playerID} joined a game with game code ${gameCode}!`);
-	
-	// subscribe socket to given gameCode
-	socket.join(gameCode);
 
-	// send player join event to all other players in the same room
-	socket.to(gameCode).emit('new-player', playerID);
+	joinGame(gameCode, playerID, socket); // join the game via sockets and database
+
+	socket.to(gameCode).emit('new-player', playerID); // send player join event to all other players in the same room
 
 	// show new player how the game is currently
 	deliverSnapshot(socket, gameCode);
@@ -54,6 +52,12 @@ io.on('connect', (socket) => {
     console.log("Made a socket connection", socket.id);
     
 });
+
+// subscribes player to game room socket events and adds player to PlayerGame database
+async function joinGame(gameCode, playerID, socket) {
+    socket.join(gameCode); // subscribe socket to game room
+    // TODO: add player to PlayerGame database
+}
 
 // delivers game snapshot to new players
 async function deliverSnapshot (socket, gameCode) {
