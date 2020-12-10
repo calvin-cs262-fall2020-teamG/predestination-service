@@ -67,32 +67,63 @@ function addClue(gameCode, playerID, clueID, timeStamp) {
     // TODO: insert relevant data into the CluePlayer database
 }
 
+/* getGameLog() gets the players ID associated with the clue ID
+ * @params: gameCode
+ * returns: player id, clue id, time
+ */
 async function getGameLog(gameCode) {
-    try {
-	
-    } catch (err) {
-	
-    };
+    db.many(`SELECT player.id, clueplayer.clueid, clueplayer.time FROM Player
+     INNER JOIN clueplayer ON 
+     player.id = clueplayer.id`)
+        .then(data => {
+            return data
+        })
+        .catch(err => {
+            console.log(err)
+        });
     // TODO: should return a list of objects each with the following format
     // {
     //    playerID: STRING,
     //    clueID: INTEGER,
     //    timeStamp: MS SINCE EPOCH,
     // }
-    return [];
+
 }
 
-async function getPlayerData(gameCode, req, res, next) {
-    db.many(`SELECT * FROM Player`)
+/* getPlayerData() retrieves required player data form the Player table
+ * that is need for our deliverSnapshot function. This returns google account information.
+ * @params: gameCode
+ * @returns: id (Google ID), name, profilePictureURL
+ */
+async function getPlayerData(gameCode) {
+    db.one(`SELECT id, name, profilePictureURL FROM Player`)
         .then(data => {
-            res.send(data);
+            return data
         })
         .catch(err => {
-            next(err);
+            console.log(err)
         });
+    // TODO: should return a list of players each with the following format
+    // {
+    //    playerID: STRING,
+    //    profileImageURL: STRING,
+    //    displayName: STRING,
+    // }
 }
 
+/* getClueData() retrieves required clue data from the Clue table
+ * that is needed for our deliverSnapshot function.
+ * @params: gameCode
+ * @returns: clueid, description, latitude, longitude
+ */
 async function getClueData(gameCode) {
+    db.any(`SELECT id, description, latitude, longitude FROM Clue`)
+        .then(data => {
+            return data
+        })
+        .catch(err => {
+            console.log(err)
+        });
     // TODO: should return a list of clues each with the following format
     // {
     //    clueID: STRING,
@@ -100,7 +131,6 @@ async function getClueData(gameCode) {
     //    Longitude: DOUBLE,
     //    description: STRING,
     // }
-    return [];
 }
 
 const router = express.Router();
@@ -152,6 +182,7 @@ function readClue(req, res, next) {
             next(err);
         })
 }
+
 
 
 /*
@@ -241,7 +272,6 @@ router.get("/", readHelloMessage);
 router.get("/clues", readClues);
 router.get("/clues/:id", readClue);
 router.post('/login', createUser);
-router.get('/game/playerdata', getPlayerData)
 
 //router.get("/user/:googleid/signin/", signInUser);
 //router.get("/user/:googleid/profile/", getUserData);
