@@ -64,7 +64,7 @@ async function joinGame(gameCode, playerID, socket) {
  * returns: void
  * postcondition: socket is given necessary information to start the game
  */
-async function deliverSnapshot (socket, gameCode) {
+async function deliverSnapshot(socket, gameCode) {
     const gameLog = await getGameLog(gameCode);
     const playerData = await getPlayerData(gameCode);
     const clueData = await getClueData(gameCode);
@@ -251,7 +251,7 @@ const getGamePlayers = async (req, res, next) => {
  * joinGame prepares player for game by giving current snapshot of game to
  * client and subscribing them to the room identified by the gameCode
  */
-const joinGame = async (socket, gameCode, playerID) => {
+async function joinGame(socket, gameCode, playerID) {
     const data = await db.many(`SELECT PlayerID, name, profilePictureURL, points FROM PlayerGame, Player, CluePlayer, Clue WHERE playerID=Player.ID AND gameID=${gameCode} AND Clue.gameID=${gameCode}`); //todo
     socket.emit('players-snapshot', data);
     socket.join(gameCode);
