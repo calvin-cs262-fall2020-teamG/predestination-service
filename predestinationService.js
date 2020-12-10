@@ -56,7 +56,7 @@ io.on('connect', (socket) => {
 });
 
 // delivers game snapshot to new players
-async function deliverSnapshot (socket, gameCode) => {
+async function deliverSnapshot (socket, gameCode) {
     const await gameLog = getGameLog(gameCode);
     const await playerData = getPlayerData(gameCode);
     const await clueData = getClueData(gameCode);
