@@ -154,6 +154,7 @@ function createUser(req, res, next) {
     const googleid = req.body.googleid;
     const name = req.body.name;
     const profilePictureURL = req.body.profilePictureURL;
+    console.log(googleid, name)
     db.one(`INSERT INTO Player(ID, name, profilePictureURL) VALUES ($1, $2, $3)`, [googleid, name, profilePictureURL]).then(
         data => {
             res.send(data);
