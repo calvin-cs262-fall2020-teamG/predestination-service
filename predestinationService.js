@@ -139,31 +139,35 @@ const joinGame = async (socket, gameCode, playerID) => {
     socket.join(gameCode);
 }
 
-function auth(req, res, next) {
-    const googleid = req.body.googleid;
-    const name = req.body.name;
-    const profilePictureURL = req.body.profilePictureURL;
-}
+// function auth(req, res, next) {
+//     const googleid = req.body.googleid;
+//     const name = req.body.name;
+//     const profilePictureURL = req.body.profilePictureURL;
+// }
 
 /*
 signInUser updates the Player table with corresponding Google account data
 Postcondition: if user does not exist in table, add user
 @params: Google userid
  */
-const createUser = async (req, res, next) => {
-    try {
-        await db.none('INSERT INTO Player(ID, name, profilePictureURL) VALUES (${googleid}, ${name}, ${profilePictureURL}) ON DUPLICATE KEY UPDATE SET profilePictureURL=${profilePictureURL}, name=${name}', req.body);
-    } catch (err) {
-        next(err);
-    }
-};
+function createUser(req, res, next) {
+    const googleid = req.body.googleid;
+    const name = req.body.name;
+    const profilePictureURL = req.body.profilePictureURL;
+    db.one(`INSERT INTO Player(ID, name, profilePictureURL) VALUES ($1, $2, $3)`, [googleid, name, profilePictureURL]).then(
+        data => {
+            res.send(data);
+        }
+    ).catch(err => {
+    next(err)
+    })
+}
 
 /** Setup express routes */
 router.get("/", readHelloMessage);
 router.get("/clues", readClues);
 router.get("/clues/:id", readClue);
-router.post('/auth/login', auth);
-router.post('/auth/createUser', createUser)
+router.post('/login', createUser);
 
 //router.get("/user/:googleid/signin/", signInUser);
 //router.get("/user/:googleid/profile/", getUserData);
