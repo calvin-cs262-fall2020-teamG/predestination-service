@@ -98,17 +98,17 @@ getUserData retrieves Google account data from the Player data
 @params: user ID
 returns: username, photo URL
  */
-const getUserData = async (req, res, next) => {
-    try {
-        const data = await db.oneOrNone(
-            `SELECT * FROM Player
-            WHERE ID=${googleid}`
-        );
-        res.send(data);
-    } catch (err) {
-        next(err);
-    }
-}
+// const getUserData = async (req, res, next) => {
+//     try {
+//         const data = await db.oneOrNone(
+//             `SELECT * FROM Player
+//             WHERE ID=${googleid}`
+//         );
+//         res.send(data);
+//     } catch (err) {
+//         next(err);
+//     }
+// }
 
 // @params: user ID,
 // returns: list of clues, noting which ones were received and not received
@@ -150,12 +150,19 @@ const joinGame = async (socket, gameCode, playerID) => {
     socket.join(gameCode);
 }
 
+const getUserData = ('predestination-service.herokuapp.com/userdata', function(req, res) {
+    const user_id = req.param('id');
+    const name = req.param('name');
+    const photo = req.param('photo')
+});
+
 /** Setup express routes */
 router.get("/", readHelloMessage);
 router.get("/clues", readClues);
 router.get("/clues/:id", readClue);
+router.get("/userdata", getUserData);
 router.get("/user/:googleid/signin/", signInUser);
-router.get("/user/:googleid/profile/", getUserData);
+//router.get("/user/:googleid/profile/", getUserData);
 router.get("/game/:gameid/players", getGamePlayers);
 router.get("/game/:gameid/seeker/:googleid/clues", getPlayerClues);
 router.get("/game/:gameid/seeker/:googleid/addpoints/:clueid/:time", updatePlayerClues);
