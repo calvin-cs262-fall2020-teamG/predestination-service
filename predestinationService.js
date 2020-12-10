@@ -151,9 +151,10 @@ const joinGame = async (socket, gameCode, playerID) => {
 }
 
 const getUserData = ('predestination-service.herokuapp.com/userdata', function(req, res) {
-    const user_id = req.param('id');
-    const name = req.param('name');
-    const photo = req.param('photo')
+    const user_id = req.params.id;
+    // const name = req.query('name');
+    // const photo = req.query('photo')
+    res.send(user_id);
 });
 
 /** Setup express routes */
