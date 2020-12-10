@@ -37,14 +37,10 @@ io.on('connect', (socket) => {
 
 	// show new player how the game is currently
 	deliverSnapshot(socket, gameCode);
-	
-	// give new player a snapshot of the current game
-	socket.emit('players-snapshot', gameLog, playerData, clueData);
 
 	// when this socket gets a clue, update all others
 	socket.on('update', (clueID, timeStamp) => {
-	    console.log(`Player ${playerID} found clue ${clueID}! Congratulations!`);
-	    socket.to(gameCode).emit('update', playerID, clueID, timeStamp);
+	    addClue(gameCode, playerID, clueID, timeStamp, socket); // handle the discovery of a clue
 	});
 	
     });
@@ -53,13 +49,21 @@ io.on('connect', (socket) => {
     
 });
 
-// subscribes player to game room socket events and adds player to PlayerGame database
+/* joinGame()
+ * @params: gameCode, playerID, socket
+ * returns: void
+ * postcondition: socket is subscribed to game room, and player is added to PlayerGame database
+ */
 async function joinGame(gameCode, playerID, socket) {
     socket.join(gameCode); // subscribe socket to game room
     // TODO: add player to PlayerGame database
 }
 
-// delivers game snapshot to new players
+/* deliverSnapshot()
+ * @params: socket, gameCode
+ * returns: void
+ * postcondition: socket is given necessary information to start the game
+ */
 async function deliverSnapshot (socket, gameCode) {
     const gameLog = await getGameLog(gameCode);
     const playerData = await getPlayerData(gameCode);
@@ -67,7 +71,14 @@ async function deliverSnapshot (socket, gameCode) {
     socket.emit('players-snapshot', gameLog, playerData, clueData);
 }
 
-function addClue(gameCode, playerID, clueID, timeStamp) {
+/* addClue() 
+ * @params: gameCode, playerID, clueID, timeStamp, socket
+ * postcondition: broadcasts clue discovery to all sockets, except the one who discovered it, and updates database
+ * returns: void
+ */
+async function addClue(gameCode, playerID, clueID, timeStamp, socket) {
+    console.log(`Player ${playerID} found clue ${clueID}! Congratulations!`);
+    socket.to(gameCode).emit('update', playerID, clueID, timeStamp);
     // TODO: insert relevant data into the CluePlayer database
 }
 
