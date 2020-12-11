@@ -78,7 +78,7 @@ io.on('connect', (socket) => {
 async function joinGame(gameCode, playerID, socket) {
     socket.join(gameCode); // subscribe socket to game room
     // TODO: add player to PlayerGame database
-    await db.none(`INSERT INTO PlayerGame(gameID, playerID) VALUES(${gameCode}, ${playerID}) ON CONFLICT (gameID, playerID) DO NOTHING`);
+    await db.none(`INSERT INTO PlayerGame(gameID, playerID) VALUES(${gameCode}, ${playerID}) ON CONFLICT DO NOTHING`);
 }
 
 /* deliverSnapshot()
