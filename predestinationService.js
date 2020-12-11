@@ -135,7 +135,7 @@ async function getPlayerData(gameCode) {
  */
 const getClueData = async (gameCode) => {
     try {
-        return await db.many(`SELECT id, description, points, gameid, latitude, longitude FROM Clue WHERE gameid=${gameCode}`);
+        return await db.any(`SELECT id, description, points, gameid, latitude, longitude FROM Clue WHERE gameid=${gameCode}`);
     } catch (err) {
         console.log(err);
     }
