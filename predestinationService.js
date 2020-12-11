@@ -139,6 +139,7 @@ async function getClueData(gameCode) {
         .catch(err => {
             console.log(err)
         });
+    console.log(this.data)
     // TODO: should return a list of clues each with the following format
     // {
     //    clueID: STRING,
