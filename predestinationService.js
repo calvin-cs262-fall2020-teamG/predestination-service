@@ -73,6 +73,7 @@ io.on('connect', (socket) => {
 	// when this socket gets a clue, update all others
 	socket.on('update', (clueID, timeStamp) => {
 	    db.task(t => {
+		console.log(`Player ${playerID} found clue ${clueID}`);
 		addClue(gameCode, playerID, clueID, timeStamp, socket, t); // handle the discovery of a clue
 	    });
 	});
@@ -117,8 +118,13 @@ async function deliverSnapshot(socket, gameCode, t) {
  */
 async function addClue(gameCode, playerID, clueID, timeStamp, socket, t) {
     console.log(`Player ${playerID} found clue ${clueID}! Congratulations!`);
-    socket.to(gameCode).emit('update', playerID, clueID, timeStamp);
-    // TODO: insert relevant data into the CluePlayer database
+    try {
+	await db.none("INSERT IGNORE INTO CluePlayer (ClueID, playerID, time) VALUES (${clueID}, ${playerID}, ${timeStamp})");
+	io.to(gameCode).emit('update', playerID, clueID, timeStamp);
+    } catch (e) {
+	console.log(e);
+    }
+    
 }
 
 /* getGameLog() gets the players ID associated with the clue ID
