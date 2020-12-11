@@ -65,8 +65,11 @@ async function joinGame(gameCode, playerID, socket) {
  * postcondition: socket is given necessary information to start the game
  */
 async function deliverSnapshot(socket, gameCode) {
+    console.log("retreiving gameLog");
     const gameLog = await getGameLog(gameCode);
+    console.log("retreiving playerData");
     const playerData = await getPlayerData(gameCode);
+    console.log("retreiving clueData");
     const clueData = await getClueData(gameCode);
     socket.emit('players-snapshot', gameLog, playerData, clueData);
 }
