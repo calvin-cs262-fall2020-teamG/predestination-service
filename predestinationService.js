@@ -130,10 +130,10 @@ async function getPlayerData(gameCode) {
  * @params: gameCode
  * @returns: clueid, description, latitude, longitude
  */
-async function getClueData(gameCode) {
+async function getClueData(gameCode, req, res) {
     db.any(`SELECT id, description, points, gameid, latitude, longitude FROM Clue`)
         .then(data => {
-            console.log(data)
+            res.send(data)
         })
         .catch(err => {
             console.log(err)
