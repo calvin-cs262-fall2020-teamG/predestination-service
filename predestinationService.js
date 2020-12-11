@@ -23,8 +23,6 @@ const db = pgp({
     password: process.env.DB_PASSWORD
 });
 
-intialize();
-
 const initialize = async () => {
     try {
 	await db.none(new QueryFile('sql/predestination.sql', {minify: true}));
@@ -33,6 +31,8 @@ const initialize = async () => {
 	console.log(err);
     }
 }
+
+initialize();
 
 /** Setup express server */
 const express = require('express');
