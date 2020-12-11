@@ -134,7 +134,7 @@ async function getGameLog(gameCode) {
  * @returns: id (Google ID), name, profilePictureURL
  */
 async function getPlayerData(gameCode) {
-    db.one(`SELECT id, name, "profilePictureURL" FROM Player, PlayerGame WHERE PlayerGame.playerID=Player.ID AND PlayerGame.gameID=${gameCode}`)
+    db.any(`SELECT id, name, "profilePictureURL" FROM Player, PlayerGame WHERE PlayerGame.playerID=Player.ID AND PlayerGame.gameID=${gameCode}`)
         .then(data => {
             return data;
         })
