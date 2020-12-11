@@ -56,6 +56,7 @@ io.on('connect', (socket) => {
 async function joinGame(gameCode, playerID, socket) {
     socket.join(gameCode); // subscribe socket to game room
     // TODO: add player to PlayerGame database
+    await db.none('INSERT IGNORE INTO PlayerGame(gameID, playerID) VALUES($1, $2)', gameCode, playerID);
 }
 
 /* deliverSnapshot()
