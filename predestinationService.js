@@ -56,7 +56,7 @@ io.on('connect', (socket) => {
 async function joinGame(gameCode, playerID, socket) {
     socket.join(gameCode); // subscribe socket to game room
     // TODO: add player to PlayerGame database
-    await db.none('INSERT INTO PlayerGame(gameID, playerID) VALUES($1, $2) ON CONFLICT (gameID, playerID) DO NOTHING', gameCode, playerID);
+    await db.none(`INSERT INTO PlayerGame(gameID, playerID) VALUES(${gameCode}, ${playerID}) ON CONFLICT (gameID, playerID) DO NOTHING`);
 }
 
 /* deliverSnapshot()
@@ -71,6 +71,7 @@ async function deliverSnapshot(socket, gameCode) {
     const playerData = await getPlayerData(gameCode);
     console.log("retreiving clueData");
     const clueData = await getClueData(gameCode);
+    console.log('send player snapshot');
     socket.emit('players-snapshot', gameLog, playerData, clueData);
 }
 
@@ -112,7 +113,7 @@ async function getGameLog(gameCode) {
  * @returns: id (Google ID), name, profilePictureURL
  */
 async function getPlayerData(gameCode) {
-    db.one(`SELECT id, name, profilePictureURL FROM Player, PlayerGame WHERE PlayerGame.playerID=Player.ID AND PlayerGame.gameID=${gameCode}`)
+    db.one(`SELECT id, name, "profilePictureURL" FROM Player, PlayerGame WHERE PlayerGame.playerID=Player.ID AND PlayerGame.gameID=${gameCode}`)
         .then(data => {
             return data;
         })
