@@ -87,8 +87,8 @@ async function addClue(gameCode, playerID, clueID, timeStamp, socket) {
  * returns: player id, clue id, time
  */
 async function getGameLog(gameCode) {
-    db.many(`SELECT player.id, clueplayer.clueid, clueplayer.time, clue.gameid, game.gameid FROM Player, Clue, Game
-    WHERE game.gameID=${gameCode} AND clue.id=player.id`)
+    db.many(`SELECT ClueID, playerID, time FROM Clue, CluePlayer
+    WHERE Clue.gameID=${gameCode}`)
         .then(data => {
             return data;
         })
