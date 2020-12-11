@@ -89,7 +89,7 @@ async function getGameLog(gameCode) {
     db.many(`SELECT player.id, clueplayer.clueid, clueplayer.time, clue.gameid, game.gameid FROM Player, Clue, Game
     WHERE game.gameID=${gameCode} AND clue.id=player.id`)
         .then(data => {
-            return data
+            return data;
         })
         .catch(err => {
             console.log(err)
@@ -109,9 +109,9 @@ async function getGameLog(gameCode) {
  * @returns: id (Google ID), name, profilePictureURL
  */
 async function getPlayerData(gameCode) {
-    db.one(`SELECT id, name, profilePictureURL FROM Player`)
+    db.one(`SELECT id, name, profilePictureURL FROM Player, PlayerGame WHERE PlayerGame.playerID=Player.ID AND PlayerGame.gameID=${gameCode}`)
         .then(data => {
-            return data
+            return data;
         })
         .catch(err => {
             console.log(err)
