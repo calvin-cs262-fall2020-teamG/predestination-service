@@ -130,21 +130,12 @@ async function getPlayerData(gameCode) {
  * @params: gameCode
  * @returns: clueid, description, latitude, longitude
  */
-async function getClueData(gameCode, req, res) {
-    db.any(`SELECT id, description, points, gameid, latitude, longitude FROM Clue`)
-        .then(data => {
-            res.send(data)
-        })
-        .catch(err => {
-            console.log(err)
-        });
-    // TODO: should return a list of clues each with the following format
-    // {
-    //    clueID: STRING,
-    //    Latitude: DOUBLE,
-    //    Longitude: DOUBLE,
-    //    description: STRING,
-    // }
+const getClueData = async (gameCode) => {
+    try {
+        return await db.many(`SELECT id, description, points, gameid, latitude, longitude FROM Clue WHERE gameid=${gameCode}`);
+    } catch (err) {
+        console.log(err);
+    }
 }
 
 const router = express.Router();
