@@ -23,7 +23,7 @@ const db = pgp({
     password: process.env.DB_PASSWORD
 });
 
-db.none(new QueryFile('predestination.sql', {minify: true}));
+db.none(new QueryFile('sql/predestination.sql', {minify: true}));
 
 /** Setup express server */
 const express = require('express');
