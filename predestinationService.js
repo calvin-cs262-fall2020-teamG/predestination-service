@@ -56,7 +56,7 @@ io.on('connect', (socket) => {
 async function joinGame(gameCode, playerID, socket) {
     socket.join(gameCode); // subscribe socket to game room
     // TODO: add player to PlayerGame database
-    await db.none('INSERT IGNORE INTO PlayerGame(gameID, playerID) VALUES($1, $2)', gameCode, playerID);
+    await db.none('INSERT INTO PlayerGame(gameID, playerID) VALUES($1, $2) ON CONFLICT (gameID, playerID) DO NOTHING', gameCode, playerID);
 }
 
 /* deliverSnapshot()
@@ -90,8 +90,7 @@ async function addClue(gameCode, playerID, clueID, timeStamp, socket) {
  * returns: player id, clue id, time
  */
 async function getGameLog(gameCode) {
-    db.many(`SELECT ClueID, playerID, time FROM Clue, CluePlayer
-    WHERE Clue.gameID=${gameCode}`)
+    db.many(`SELECT ClueID, playerID, time FROM Clue, CluePlayer WHERE Clue.gameID=${gameCode}`)
         .then(data => {
             return data;
         })
