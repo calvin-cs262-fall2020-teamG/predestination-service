@@ -211,7 +211,7 @@ const getUserData = async (req, res, next) => {
 // returns: list of clues, noting which ones were received and not received
 const getPlayerClues = async (req, res, next) => {
     try {
-        const data = await db.many("SELECT * FROM CluePlayer, Clue WHERE CluePlayer.playerID=${googleid} AND WHERE CluePlayer.ClueID=Clue.ID AND WHERE Clue.gameID=${gameid}", req.body);
+        const data = await db.many("SELECT * FROM CluePlayer, Clue WHERE CluePlayer.playerID${googleid} AND WHERE CluePlayer.ClueID=Clue.ID AND WHERE Clue.gameID=${gameid}", req.body);
         res.send(data);
     } catch (err) {
         next(err);
@@ -241,11 +241,11 @@ const getGamePlayers = async (req, res, next) => {
  * joinGame prepares player for game by giving current snapshot of game to
  * client and subscribing them to the room identified by the gameCode
  */
-async function joinGame(socket, gameCode, playerID) {
-    const data = await db.many(`SELECT PlayerID, name, profilePictureURL, points FROM PlayerGame, Player, CluePlayer, Clue WHERE playerID=Player.ID AND gameID=${gameCode} AND Clue.gameID=${gameCode}`); //todo
-    socket.emit('players-snapshot', data);
-    socket.join(gameCode);
-}
+// async function joinGame(socket, gameCode, playerID) {
+//     const data = await db.many(`SELECT PlayerID, name, profilePictureURL, points FROM PlayerGame, Player, CluePlayer, Clue WHERE playerID=Player.ID AND gameID=${gameCode} AND Clue.gameID=${gameCode}`); //todo
+//     socket.emit('players-snapshot', data);
+//     socket.join(gameCode);
+// }
 
 // function auth(req, res, next) {
 //     const googleid = req.body.googleid;
