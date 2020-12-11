@@ -134,12 +134,11 @@ async function getClueData(gameCode) {
     db.any(`SELECT id, description, latitude, longitude, gameid FROM Clue
             WHERE gameid=${gameCode}`)
         .then(data => {
-            return data
+            console.log(data)
         })
         .catch(err => {
             console.log(err)
         });
-    console.log(this.data)
     // TODO: should return a list of clues each with the following format
     // {
     //    clueID: STRING,
