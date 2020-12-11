@@ -15,12 +15,14 @@ const {QueryFile} = require('pg-promise');
 //     return new QueryFile(, {minify: true});
 // }
 
+const credentials = require('./credentials');
+
 const db = pgp({
-    host: process.env.DB_SERVER,
+    host: credentials.host,//process.env.DB_SERVER,
     port: process.env.DB_PORT,
-    database: process.DB_USER,
-    user: process.env.DB_USER,
-    password: process.env.DB_PASSWORD
+    database: credentials.user,//process.DB_USER,
+    user: credentials.user,//process.env.DB_USER,
+    password: credentials.password,//process.env.DB_PASSWORD
 });
 
 const initialize = async () => {
@@ -159,7 +161,6 @@ const getClueData = async (gameCode) => {
         return await db.any(`SELECT id, description, points, gameid, latitude, longitude FROM Clue WHERE gameid=${gameCode}`);
     } catch (err) {
 	console.error(err);
-	console.log('getClueData ran into an error!!!!!!');
     }
 }
 
