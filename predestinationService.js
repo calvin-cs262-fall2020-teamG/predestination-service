@@ -131,7 +131,8 @@ async function getPlayerData(gameCode) {
  * @returns: clueid, description, latitude, longitude
  */
 async function getClueData(gameCode) {
-    db.any(`SELECT id, description, latitude, longitude FROM Clue`)
+    db.any(`SELECT id, description, latitude, longitude, gameid FROM Clue
+            WHERE gameid=${gameCode}`)
         .then(data => {
             return data
         })
