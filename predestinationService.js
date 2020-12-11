@@ -27,7 +27,9 @@ const db = pgp({
 
 const initialize = async () => {
     try {
-	await db.none(new QueryFile('sql/predestination.sql', {minify: true}));
+	db.task(t => {
+	    t.none(new QueryFile('sql/predestination.sql', {minify: true}));
+	});
     } catch (err) {
 	console.log('Loading predestination.sql ran into an error');
 	console.log(err);
@@ -42,11 +44,15 @@ const app = require('express')();
 const http = require('http').createServer(app);
 const io = require('socket.io')(http);
 
-const port = process.env.PORT || 3000;
+const port = 80;//process.env.PORT || 3000;
 
 http.listen(port, () => {
     console.log(`listening on *:${port}`);
 });
+
+const test = async (t, gameCode) => {
+    return await t.any(`SELECT ClueID, playerID, time FROM Clue, CluePlayer WHERE Clue.gameID=${gameCode} AND Clue.ID=CluePlayer.ClueID`);
+};
 
 io.on('connect', (socket) => {
 
@@ -54,16 +60,21 @@ io.on('connect', (socket) => {
 	
 	console.log(`Player ${playerID} joined a game with game code ${gameCode}!`);
 
-	joinGame(gameCode, playerID, socket); // join the game via sockets and database
-
 	socket.to(gameCode).emit('new-player', playerID); // send player join event to all other players in the same room
 
 	// show new player how the game is currently
-	deliverSnapshot(socket, gameCode);
-
+	db.task(async (t) => {
+	    await joinGame(gameCode, playerID, socket, t); // join the game via sockets and database
+	    await deliverSnapshot(socket, gameCode, t);
+	}).catch(error => {
+	    console.log(error);
+	});
+	
 	// when this socket gets a clue, update all others
 	socket.on('update', (clueID, timeStamp) => {
-	    addClue(gameCode, playerID, clueID, timeStamp, socket); // handle the discovery of a clue
+	    db.task(t => {
+		addClue(gameCode, playerID, clueID, timeStamp, socket, t); // handle the discovery of a clue
+	    });
 	});
 	
     });
@@ -77,10 +88,10 @@ io.on('connect', (socket) => {
  * returns: void
  * postcondition: socket is subscribed to game room, and player is added to PlayerGame database
  */
-async function joinGame(gameCode, playerID, socket) {
+async function joinGame(gameCode, playerID, socket, t) {
     socket.join(gameCode); // subscribe socket to game room
     // TODO: add player to PlayerGame database
-    await db.none(`INSERT INTO PlayerGame(gameID, playerID) VALUES(${gameCode}, ${playerID}) ON CONFLICT DO NOTHING`);
+    await t.none(`INSERT INTO PlayerGame(gameID, playerID) VALUES(${gameCode}, ${playerID}) ON CONFLICT DO NOTHING`);
 }
 
 /* deliverSnapshot()
@@ -88,15 +99,15 @@ async function joinGame(gameCode, playerID, socket) {
  * returns: void
  * postcondition: socket is given necessary information to start the game
  */
-async function deliverSnapshot(socket, gameCode) {
+async function deliverSnapshot(socket, gameCode, t) {        
     console.log("retreiving gameLog");
-    const gameLog = await getGameLog(gameCode);
+    const gameLog = await getGameLog(gameCode, t);
     console.log("retreiving playerData");
-    const playerData = await getPlayerData(gameCode);
+    const playerData = await getPlayerData(gameCode, t);
     console.log("retreiving clueData");
-    const clueData = await getClueData(gameCode);
+    const clueData = await getClueData(gameCode, t);
     console.log('send player snapshot');
-    socket.emit('players-snapshot', gameLog, playerData, clueData);
+    socket.emit('players-snapshot', gameLog, playerData, clueData);    
 }
 
 /* addClue() 
@@ -104,7 +115,7 @@ async function deliverSnapshot(socket, gameCode) {
  * postcondition: broadcasts clue discovery to all sockets, except the one who discovered it, and updates database
  * returns: void
  */
-async function addClue(gameCode, playerID, clueID, timeStamp, socket) {
+async function addClue(gameCode, playerID, clueID, timeStamp, socket, t) {
     console.log(`Player ${playerID} found clue ${clueID}! Congratulations!`);
     socket.to(gameCode).emit('update', playerID, clueID, timeStamp);
     // TODO: insert relevant data into the CluePlayer database
@@ -114,13 +125,9 @@ async function addClue(gameCode, playerID, clueID, timeStamp, socket) {
  * @params: gameCode
  * returns: player id, clue id, time
  */
-async function getGameLog(gameCode) {
-    db.any(`SELECT ClueID, playerID, time FROM Clue, CluePlayer WHERE Clue.gameID=${gameCode} AND Clue.ID=CluePlayer.ClueID`).then(data => {
-            return data;
-        })
-        .catch(err => {
-            console.log(err)
-        });
+async function getGameLog(gameCode, t) {
+    console.log(`t is ${t}`);
+    return await t.any(`SELECT ClueID, playerID, time FROM Clue, CluePlayer WHERE Clue.gameID=${gameCode} AND Clue.ID=CluePlayer.ClueID`);
     // TODO: should return a list of objects each with the following format
     // {
     //    playerID: STRING,
@@ -135,14 +142,8 @@ async function getGameLog(gameCode) {
  * @params: gameCode
  * @returns: id (Google ID), name, profilePictureURL
  */
-async function getPlayerData(gameCode) {
-    db.any(`SELECT id, name, "profilePictureURL" FROM Player, PlayerGame WHERE PlayerGame.playerID=Player.ID AND PlayerGame.gameID=${gameCode}`)
-        .then(data => {
-            return data;
-        })
-        .catch(err => {
-            console.log(err)
-        });
+async function getPlayerData(gameCode, t) {
+    return await t.any(`SELECT id, name, "profilePictureURL" FROM Player, PlayerGame WHERE PlayerGame.playerID=Player.ID AND PlayerGame.gameID=${gameCode}`);
     // TODO: should return a list of players each with the following format
     // {
     //    playerID: STRING,
@@ -156,12 +157,8 @@ async function getPlayerData(gameCode) {
  * @params: gameCode
  * @returns: clueid, description, latitude, longitude
  */
-const getClueData = async (gameCode) => {
-    try {
-        return await db.any(`SELECT id, description, points, gameid, latitude, longitude FROM Clue WHERE gameid=${gameCode}`);
-    } catch (err) {
-	console.error(err);
-    }
+const getClueData = async (gameCode, t) => {
+    return await t.any(`SELECT id, description, points, gameid, latitude, longitude FROM Clue WHERE gameid=${gameCode}`);
 }
 
 const router = express.Router();
@@ -289,13 +286,15 @@ function createUser(req, res, next) {
     const name = req.body.name;
     const profilePictureURL = req.body.profilePictureURL;
     console.log(googleid, name, profilePictureURL);
-   db.none(`INSERT INTO Player(ID, name, "profilePictureURL") VALUES($1, $2, $3) ON CONFLICT (ID) DO UPDATE SET name=$2, "profilePictureURL"=$3`, [googleid, name, profilePictureURL]).then(
+    db.task(t => {
+   t.none(`INSERT INTO Player(ID, name, "profilePictureURL") VALUES($1, $2, $3) ON CONFLICT (ID) DO UPDATE SET name=$2, "profilePictureURL"=$3`, [googleid, name, profilePictureURL]).then(
         data => {
             res.send(data);
         }
     ).catch(err => {
 	next(err);
-    })
+    });
+    });
 }
 
 /** Setup express routes */
