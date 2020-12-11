@@ -23,7 +23,16 @@ const db = pgp({
     password: process.env.DB_PASSWORD
 });
 
-db.none(new QueryFile('sql/predestination.sql', {minify: true}));
+const initialize = async () => {
+    try {
+	await db.none(new QueryFile('sql/predestination.sql', {minify: true}));
+    } catch (err) {
+	console.log('Loading predestination.sql ran into an error');
+	console.log(err);
+    }
+}
+
+intialize();
 
 /** Setup express server */
 const express = require('express');
