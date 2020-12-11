@@ -4,6 +4,17 @@
  * @date: 10/27/2020
  */
 const pgp = require('pg-promise')();
+
+//https://vitaly-t.github.io/pg-promise/QueryFile.html
+const {QueryFile} = require('pg-promise');
+const {join: joinPath} = require('path');
+
+// Helper for linking to external query files:
+function sql(file) {
+    const fullPath = joinPath(__dirname, file); // generating full path;
+    return new QueryFile(fullPath, {minify: true});
+}
+
 const db = pgp({
     host: process.env.DB_SERVER,
     port: process.env.DB_PORT,
@@ -11,6 +22,8 @@ const db = pgp({
     user: process.env.DB_USER,
     password: process.env.DB_PASSWORD
 });
+
+db.none(sql('predestination.sql'));
 
 /** Setup express server */
 const express = require('express');
