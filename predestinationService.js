@@ -3,7 +3,6 @@
  * @author: Ethan Walters
  * @date: 10/27/2020
  */
-
 const pgp = require('pg-promise')();
 const db = pgp({
     host: process.env.DB_SERVER,
@@ -28,7 +27,7 @@ http.listen(port, () => {
 io.on('connect', (socket) => {
 
     socket.on('join-session', (gameCode, playerID) => {
-
+	
 	console.log(`Player ${playerID} joined a game with game code ${gameCode}!`);
 
 	joinGame(gameCode, playerID, socket); // join the game via sockets and database
@@ -273,7 +272,7 @@ function createUser(req, res, next) {
     const name = req.body.name;
     const profilePictureURL = req.body.profilePictureURL;
     console.log(googleid, name, profilePictureURL);
-    db.none(`INSERT INTO Player(ID, name, "profilePictureURL") VALUES($1, $2, $3) ON CONFLICT (ID) DO UPDATE SET name=$2, "profilePictureURL"=$3`, [googleid, name, profilePictureURL]).then(
+   db.none(`INSERT INTO Player(ID, name, "profilePictureURL") VALUES($1, $2, $3) ON CONFLICT (ID) DO UPDATE SET name=$2, "profilePictureURL"=$3`, [googleid, name, profilePictureURL]).then(
         data => {
             res.send(data);
         }
