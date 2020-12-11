@@ -137,6 +137,7 @@ const getClueData = async (gameCode) => {
     try {
         return await db.any(`SELECT id, description, points, gameid, latitude, longitude FROM Clue WHERE gameid=${gameCode}`);
     } catch (err) {
+	console.log('getClueData ran into an error!!!!!!');
         console.log(err);
     }
 }
