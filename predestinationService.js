@@ -23,7 +23,7 @@ const db = pgp({
     database: process.DB_USER,
     user: process.env.DB_USER,
     password: process.env.DB_PASSWORD,
-    max: 1, // elephant sql doesn't allow more than 5, while pg-promise defaults to 10 connections
+    max: 4, // elephant sql doesn't allow more than 5, while pg-promise defaults to 10 connections
 });
 
 const initialize = async () => {
@@ -292,10 +292,11 @@ function createUser(req, res, next) {
     const name = req.body.name;
     const profilePictureURL = req.body.profilePictureURL;
     console.log(googleid, name, profilePictureURL);
+    res.end('Logged in');
     db.task(t => {
 		return t.none(`INSERT INTO Player(ID, name, "profilePictureURL") VALUES($1, $2, $3) ON CONFLICT (ID) DO UPDATE SET name=$2, "profilePictureURL"=$3`, [googleid, name, profilePictureURL]).then(
         data => {
-            res.send(data);
+            //res.send(data); throws H12 errors
         }
     ).catch(err => {
 	next(err);
