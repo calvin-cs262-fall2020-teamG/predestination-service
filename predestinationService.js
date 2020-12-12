@@ -293,7 +293,7 @@ function createUser(req, res, next) {
     const profilePictureURL = req.body.profilePictureURL;
     console.log(googleid, name, profilePictureURL);
     db.task(t => {
-   t.none(`INSERT INTO Player(ID, name, "profilePictureURL") VALUES($1, $2, $3) ON CONFLICT (ID) DO UPDATE SET name=$2, "profilePictureURL"=$3`, [googleid, name, profilePictureURL]).then(
+		return t.none(`INSERT INTO Player(ID, name, "profilePictureURL") VALUES($1, $2, $3) ON CONFLICT (ID) DO UPDATE SET name=$2, "profilePictureURL"=$3`, [googleid, name, profilePictureURL]).then(
         data => {
             res.send(data);
         }
