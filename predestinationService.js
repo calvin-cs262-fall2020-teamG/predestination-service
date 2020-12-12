@@ -74,7 +74,7 @@ io.on('connect', (socket) => {
 	socket.on('update', (clueID, timeStamp) => {
 	    db.task(t => {
 		console.log(`Player ${playerID} found clue ${clueID}`);
-		addClue(gameCode, playerID, clueID, timeStamp, socket, t); // handle the discovery of a clue
+			return addClue(gameCode, playerID, clueID, timeStamp, socket, t); // handle the discovery of a clue
 	    });
 	});
 	
@@ -91,8 +91,7 @@ io.on('connect', (socket) => {
  */
 async function joinGame(gameCode, playerID, socket, t) {
     socket.join(gameCode); // subscribe socket to game room
-    // TODO: add player to PlayerGame database
-    await t.none(`INSERT INTO PlayerGame(gameID, playerID) VALUES(${gameCode}, ${playerID}) ON CONFLICT DO NOTHING`);
+    return await t.none(`INSERT INTO PlayerGame(playerID, gameID) VALUES(${playerID}, ${gameCode}) ON CONFLICT ON CONSTRAINT playergame_playerid_fkey DO NOTHING`);
 }
 
 /* deliverSnapshot()
@@ -293,7 +292,7 @@ function createUser(req, res, next) {
     const profilePictureURL = req.body.profilePictureURL;
     console.log(googleid, name, profilePictureURL);
     db.task(t => {
-   t.none(`INSERT INTO Player(ID, name, "profilePictureURL") VALUES($1, $2, $3) ON CONFLICT (ID) DO UPDATE SET name=$2, "profilePictureURL"=$3`, [googleid, name, profilePictureURL]).then(
+		return t.none(`INSERT INTO Player(ID, name, "profilePictureURL") VALUES($1, $2, $3) ON CONFLICT (ID) DO UPDATE SET name=$2, "profilePictureURL"=$3`, [googleid, name, profilePictureURL]).then(
         data => {
             res.send(data);
         }

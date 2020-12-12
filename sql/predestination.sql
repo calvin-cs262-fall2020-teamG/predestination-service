@@ -28,7 +28,6 @@ CREATE TABLE PlayerGame
     gameid integer,
     playerid numeric,
     foreign key(playerid) references player(id)
-
 );
 
 CREATE TABLE Clue
