@@ -36,12 +36,6 @@ const app = require('express')();
 const http = require('http').createServer(app);
 const io = require('socket.io')(http);
 
-const router = express.Router();
-router.use(express.json());
-
-app.use(router);
-app.use(errorHandler);
-
 const port = process.env.PORT || 3000;
 
 http.listen(port, () => {
@@ -180,6 +174,12 @@ function createUser(req, res, next) {
         });
     });
 }
+
+const router = express.Router();
+router.use(express.json());
+
+app.use(router);
+app.use(errorHandler);
 
 function errorHandler(err, req, res) {
     if (app.get('env') === "development") {
