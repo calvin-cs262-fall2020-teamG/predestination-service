@@ -177,6 +177,7 @@ router.use(express.json());
 
 app.use(router);
 app.use(errorHandler);
+
 // app.listen(port, () => console.log(`Listening on port ${port}`));
 
 function errorHandler(err, req, res) {
@@ -221,8 +222,6 @@ function readClue(req, res, next) {
             next(err);
         })
 }
-
-
 
 /*
 getUserData retrieves Google account data from the Player data

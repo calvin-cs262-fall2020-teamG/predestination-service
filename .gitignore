@@ -6,5 +6,3 @@ node_modules
 
 # Local heroku config vars
 .env
-
-credentials.js
