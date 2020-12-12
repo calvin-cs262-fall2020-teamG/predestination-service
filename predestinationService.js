@@ -15,14 +15,14 @@ const {QueryFile} = require('pg-promise');
 //     return new QueryFile(, {minify: true});
 // }
 
-const credentials = require('./credentials');
+// const credentials = require('./credentials');
 
 const db = pgp({
-    host: credentials.host,//process.env.DB_SERVER,
+    host: process.env.DB_SERVER,
     port: process.env.DB_PORT,
-    database: credentials.user,//process.DB_USER,
-    user: credentials.user,//process.env.DB_USER,
-    password: credentials.password,//process.env.DB_PASSWORD
+    database: process.DB_USER,
+    user: process.env.DB_USER,
+    password: process.env.DB_PASSWORD
 });
 
 const initialize = async () => {
