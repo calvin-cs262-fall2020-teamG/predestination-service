@@ -1,4 +1,8 @@
 .vscode/*
 node_modules
-.env
+
+# WebStorm files
 .idea/*
+
+# Local heroku config vars
+.env
