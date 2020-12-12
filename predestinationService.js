@@ -57,8 +57,6 @@ io.on('connect', (socket) => {
 	
 	console.log(`Player ${playerID} joined a game with game code ${gameCode}!`);
 
-	socket.to(gameCode).emit('new-player', playerID); // send player join event to all other players in the same room
-
 	// show new player how the game is currently
 	db.task(async (t) => {
 	    await joinGame(gameCode, playerID, socket, t); // join the game via sockets and database
@@ -89,7 +87,14 @@ io.on('connect', (socket) => {
 async function joinGame(gameCode, playerID, socket, t) {
     socket.join(gameCode); // subscribe socket to game room
     try {
-        return await t.none(`INSERT INTO PlayerGame(playerID, gameID) VALUES(${playerID}, ${gameCode}) ON CONFLICT ON CONSTRAINT ux_gameid_playerid DO NOTHING`);
+        return await t.none(`INSERT INTO PlayerGame(playerID, gameID) VALUES(${playerID}, ${gameCode}) ON CONFLICT ON CONSTRAINT ux_gameid_playerid DO NOTHING`).then(() => {
+            return t.any(`SELECT * FROM Player WHERE id=${playeID}`).then(player => {
+                if (player.length === 1) {
+                    console.log('Sending player data!');
+                    socket.to(gameCode).emit('new-player', playerID, null, player[0].name);
+                }
+            });
+        });
     } catch (e) {
         console.log(e);
     }
