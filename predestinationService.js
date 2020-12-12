@@ -1,21 +1,13 @@
 /**
- * REST-inspired webservice for the Predestination DB
- * @author: Ethan Walters
- * @date: 10/27/2020
+ * REST-inspired service and backend socket code for Predestination
+ * @authors: Ethan Walters, Jacob Brink
+ * @date: Fall, 2020
  */
+
 const pgp = require('pg-promise')();
 
 //https://vitaly-t.github.io/pg-promise/QueryFile.html
 const {QueryFile} = require('pg-promise');
-// const {join: joinPath} = require('path');
-
-// // Helper for linking to external query files:
-// function sql(file) {
-//     const fullPath = joinPath(__dirname, file); // generating full path;
-//     return new QueryFile(, {minify: true});
-// }
-
-// const credentials = require('./credentials');
 
 const db = pgp({
     host: process.env.DB_SERVER,
@@ -23,7 +15,7 @@ const db = pgp({
     database: process.DB_USER,
     user: process.env.DB_USER,
     password: process.env.DB_PASSWORD,
-    max: 1, // elephant sql doesn't allow more than 5, while pg-promise defaults to 10 connections
+    max: 1, // ElephantSQL doesn't allow more than 5 concurrent connections, while pg-promise defaults to 10 connections
 });
 
 const initialize = async () => {
@@ -39,11 +31,16 @@ const initialize = async () => {
 
 initialize();
 
-/** Setup express server */
 const express = require('express');
 const app = require('express')();
 const http = require('http').createServer(app);
 const io = require('socket.io')(http);
+
+const router = express.Router();
+router.use(express.json());
+
+app.use(router);
+app.use(errorHandler);
 
 const port = process.env.PORT || 3000;
 
@@ -51,6 +48,7 @@ http.listen(port, () => {
     console.log(`listening on *:${port}`);
 });
 
+// Server socket code
 io.on('connect', (socket) => {
 
     socket.on('join-session', (gameCode, playerID) => {
@@ -72,11 +70,9 @@ io.on('connect', (socket) => {
 			return addClue(gameCode, playerID, clueID, timeStamp, socket, t); // handle the discovery of a clue
 	    });
 	});
-	
+
     });
-    
     console.log("Made a socket connection", socket.id);
-    
 });
 
 /* joinGame()
@@ -116,10 +112,11 @@ async function deliverSnapshot(socket, gameCode, t) {
     socket.emit('players-snapshot', gameLog, playerData, clueData);    
 }
 
-/* addClue() 
+/**
+ * addClue()
  * @params: gameCode, playerID, clueID, timeStamp, socket
- * postcondition: broadcasts clue discovery to all sockets, except the one who discovered it, and updates database
- * returns: void
+ * @postcondition: broadcasts clue discovery to all sockets, except the one who discovered it, and updates database
+ * @returns: void
  */
 async function addClue(gameCode, playerID, clueID, timeStamp, socket, t) {
     console.log(`Player ${playerID} found clue ${clueID}! Congratulations!`);
@@ -132,38 +129,28 @@ async function addClue(gameCode, playerID, clueID, timeStamp, socket, t) {
     
 }
 
-/* getGameLog() gets the players ID associated with the clue ID
+/**
+ *  getGameLog() gets the players ID associated with the clue ID
  * @params: gameCode
- * returns: player id, clue id, time
+ * @returns: player id, clue id, time
  */
 async function getGameLog(gameCode, t) {
     console.log(`t is ${t}`);
     return await t.any(`SELECT ClueID, playerID, time FROM Clue, CluePlayer WHERE Clue.gameID=${gameCode} AND Clue.ID=CluePlayer.ClueID`);
-    // TODO: should return a list of objects each with the following format
-    // {
-    //    playerID: STRING,
-    //    clueID: INTEGER,
-    //    timeStamp: MS SINCE EPOCH,
-    // }
-
 }
 
-/* getPlayerData() retrieves required player data form the Player table
+/**
+ * getPlayerData() retrieves required player data form the Player table
  * that is need for our deliverSnapshot function. This returns google account information.
  * @params: gameCode
  * @returns: id (Google ID), name, profilePictureURL
  */
 async function getPlayerData(gameCode, t) {
     return await t.any(`SELECT id, name, "profilePictureURL" FROM Player, PlayerGame WHERE PlayerGame.playerID=Player.ID AND PlayerGame.gameID=${gameCode}`);
-    // TODO: should return a list of players each with the following format
-    // {
-    //    playerID: STRING,
-    //    profileImageURL: STRING,
-    //    displayName: STRING,
-    // }
 }
 
-/* getClueData() retrieves required clue data from the Clue table
+/**
+ * getClueData() retrieves required clue data from the Clue table
  * that is needed for our deliverSnapshot function.
  * @params: gameCode
  * @returns: clueid, description, latitude, longitude
@@ -172,13 +159,27 @@ const getClueData = async (gameCode, t) => {
     return await t.any(`SELECT id, description, points, gameid, latitude, longitude FROM Clue WHERE gameid=${gameCode}`);
 }
 
-const router = express.Router();
-router.use(express.json());
-
-app.use(router);
-app.use(errorHandler);
-
-// app.listen(port, () => console.log(`Listening on port ${port}`));
+/**
+ * signInUser updates the Player table with corresponding Google account data
+ * @Postcondition: if user does not exist in table, add user
+ * @params: Google userid
+ */
+function createUser(req, res, next) {
+    const googleid = req.body.googleid;
+    const name = req.body.name;
+    const profilePictureURL = req.body.profilePictureURL;
+    console.log(googleid, name, profilePictureURL);
+    res.end('Logged in');
+    db.task(t => {
+        return t.none(`INSERT INTO Player(ID, name, "profilePictureURL") VALUES($1, $2, $3) ON CONFLICT (ID) DO UPDATE SET name=$2, "profilePictureURL"=$3`, [googleid, name, profilePictureURL]).then(
+            data => {
+                //res.send(data); throws H12 errors
+            }
+        ).catch(err => {
+            next(err);
+        });
+    });
+}
 
 function errorHandler(err, req, res) {
     if (app.get('env') === "development") {
@@ -187,7 +188,6 @@ function errorHandler(err, req, res) {
     res.sendStatus(err.status || 500);
 }
 
-/** If data isn't found return 404 otherwise, send required data */
 function returnDataOr404(res, data) {
     if (data == null) {
         res.sendStatus(404);
@@ -196,12 +196,19 @@ function returnDataOr404(res, data) {
     }
 }
 
-/** Sends a simple hello message - for testing */
 function readHelloMessage(req, res) {
     res.send('Hello, Predestination Service!');
 }
 
-/** Reads and returns all clues in the Clue table */
+/**
+ * readClues and readClue return all clues and clues by their ID respectively. These can be accessed with
+ * Express routes but aren't necessarily being utilized in our game because the sockets handle getting clue data
+ * from our database
+ * @param req
+ * @param res
+ * @param next
+ * @returns: JSON object(s)
+ */
 function readClues(req, res, next) {
     db.many("SELECT * FROM Clue")
         .then(data => {
@@ -212,7 +219,6 @@ function readClues(req, res, next) {
         })
 }
 
-/** Reads and returns a clue by its ID */
 function readClue(req, res, next) {
     db.oneOrNone('SELECT * FROM Clue WHERE id=${id}', req.params)
         .then(data => {
@@ -223,25 +229,13 @@ function readClue(req, res, next) {
         })
 }
 
-/*
-getUserData retrieves Google account data from the Player data
-@params: user ID
-returns: username, photo URL
+/**
+ * getPlayer clues receives clues matched to the game id
+ * @param req
+ * @param res
+ * @param next
+ * @returns list of clues
  */
-const getUserData = async (req, res, next) => {
-    try {
-        const data = await db.oneOrNone(
-            `SELECT * FROM Player
-            WHERE ID=${googleid}`
-        );
-        res.send(data);
-    } catch (err) {
-        next(err);
-    }
-}
-
-// @params: user ID,
-// returns: list of clues, noting which ones were received and not received
 const getPlayerClues = async (req, res, next) => {
     try {
         const data = await db.many("SELECT * FROM CluePlayer, Clue WHERE CluePlayer.playerID${googleid} AND WHERE CluePlayer.ClueID=Clue.ID AND WHERE Clue.gameID=${gameid}", req.body);
@@ -270,52 +264,13 @@ const getGamePlayers = async (req, res, next) => {
     }
 }
 
-/*
- * joinGame prepares player for game by giving current snapshot of game to
- * client and subscribing them to the room identified by the gameCode
- */
-// async function joinGame(socket, gameCode, playerID) {
-//     const data = await db.many(`SELECT PlayerID, name, profilePictureURL, points FROM PlayerGame, Player, CluePlayer, Clue WHERE playerID=Player.ID AND gameID=${gameCode} AND Clue.gameID=${gameCode}`); //todo
-//     socket.emit('players-snapshot', data);
-//     socket.join(gameCode);
-// }
-
-// function auth(req, res, next) {
-//     const googleid = req.body.googleid;
-//     const name = req.body.name;
-//     const profilePictureURL = req.body.profilePictureURL;
-// }
-
-/*
-signInUser updates the Player table with corresponding Google account data
-Postcondition: if user does not exist in table, add user
-@params: Google userid
- */
-function createUser(req, res, next) {
-    const googleid = req.body.googleid;
-    const name = req.body.name;
-    const profilePictureURL = req.body.profilePictureURL;
-    console.log(googleid, name, profilePictureURL);
-    res.end('Logged in');
-    db.task(t => {
-		return t.none(`INSERT INTO Player(ID, name, "profilePictureURL") VALUES($1, $2, $3) ON CONFLICT (ID) DO UPDATE SET name=$2, "profilePictureURL"=$3`, [googleid, name, profilePictureURL]).then(
-        data => {
-            //res.send(data); throws H12 errors
-        }
-    ).catch(err => {
-	next(err);
-    });
-    });
-}
-
-/** Setup express routes */
+// Setup express routes
 router.get("/", readHelloMessage);
 router.get("/clues", readClues);
 router.get("/clues/:id", readClue);
 router.post('/login', createUser);
 
-//router.get("/user/:googleid/signin/", signInUser);
-//router.get("/user/:googleid/profile/", getUserData);
+// These routes aren't being used
 router.get("/game/:gameid/players", getGamePlayers);
 router.get("/game/:gameid/seeker/:googleid/clues", getPlayerClues);
 router.get("/game/:gameid/seeker/:googleid/addpoints/:clueid/:time", updatePlayerClues);
