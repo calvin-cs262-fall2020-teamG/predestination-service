@@ -10,3 +10,6 @@ node_modules
 
 # Expo
 .expo/*
+
+# Client for socket testing
+client.js
