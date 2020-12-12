@@ -22,7 +22,8 @@ const db = pgp({
     port: process.env.DB_PORT,
     database: process.DB_USER,
     user: process.env.DB_USER,
-    password: process.env.DB_PASSWORD
+    password: process.env.DB_PASSWORD,
+    max: 1, // elephant sql doesn't allow more than 5, while pg-promise defaults to 10 connections
 });
 
 const initialize = async () => {
@@ -31,8 +32,8 @@ const initialize = async () => {
 	    return t.none(new QueryFile('sql/predestination.sql', {minify: true}));
 	});
     } catch (err) {
-	console.log('Loading predestination.sql ran into an error');
-	console.log(err);
+	    console.log('Loading predestination.sql ran into an error');
+	    console.log(err);
     }
 }
 
@@ -49,10 +50,6 @@ const port = process.env.PORT || 3000;
 http.listen(port, () => {
     console.log(`listening on *:${port}`);
 });
-
-const test = async (t, gameCode) => {
-    return await t.any(`SELECT ClueID, playerID, time FROM Clue, CluePlayer WHERE Clue.gameID=${gameCode} AND Clue.ID=CluePlayer.ClueID`);
-};
 
 io.on('connect', (socket) => {
 
@@ -73,7 +70,7 @@ io.on('connect', (socket) => {
 	// when this socket gets a clue, update all others
 	socket.on('update', (clueID, timeStamp) => {
 	    db.task(t => {
-		console.log(`Player ${playerID} found clue ${clueID}`);
+		    console.log(`Player ${playerID} found clue ${clueID}`);
 			return addClue(gameCode, playerID, clueID, timeStamp, socket, t); // handle the discovery of a clue
 	    });
 	});
@@ -91,7 +88,11 @@ io.on('connect', (socket) => {
  */
 async function joinGame(gameCode, playerID, socket, t) {
     socket.join(gameCode); // subscribe socket to game room
-    return await t.none(`INSERT INTO PlayerGame(playerID, gameID) VALUES(${playerID}, ${gameCode})`);
+    try {
+        return await t.none(`INSERT INTO PlayerGame(playerID, gameID) VALUES(${playerID}, ${gameCode}) ON CONFLICT ON CONSTRAINT ux_gameid_playerid DO NOTHING`);
+    } catch (e) {
+        console.log(e);
+    }
 }
 
 /* deliverSnapshot()
