@@ -50,7 +50,7 @@ INSERT INTO Clue (id, description, points, gameid, latitude, longitude) VALUES (
 CREATE TABLE CluePlayer
 (
     ClueID integer REFERENCES Clue(ID),
-    playerID integer REFERENCES Player(ID),
+    playerID numeric REFERENCES Player(ID),
     time timestamp,
     PRIMARY KEY (ClueID, playerID)
 );
