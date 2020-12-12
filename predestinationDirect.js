@@ -1,11 +1,4 @@
-const pgp = require('pg-promise')();
-const db = pgp({
-    host: process.env.DB_SERVER,
-    port: process.env.DB_PORT,
-    database: process.env.DB_USER,
-    user: process.env.DB_USER,
-    password: process.env.DB_PASSWORD
-});
+const db = require('./db');
 
 db.many("SELECT * FROM Clue")
 .then(function (data) {
