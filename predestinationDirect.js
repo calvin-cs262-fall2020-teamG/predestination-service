@@ -1,3 +1,8 @@
+/**
+ * I don't think we need this file because predestinationService.js
+ * is taking care of all of this, but I'll leave it updated on GitHub just in case
+ */
+
 const pgp = require('pg-promise')();
 const db = pgp({
     host: process.env.DB_SERVER,
