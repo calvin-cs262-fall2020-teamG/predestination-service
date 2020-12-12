@@ -88,7 +88,7 @@ async function joinGame(gameCode, playerID, socket, t) {
     socket.join(gameCode); // subscribe socket to game room
     try {
         return await t.none(`INSERT INTO PlayerGame(playerID, gameID) VALUES(${playerID}, ${gameCode}) ON CONFLICT ON CONSTRAINT ux_gameid_playerid DO NOTHING`).then(() => {
-            return t.any(`SELECT * FROM Player WHERE id=${playeID}`).then(player => {
+            return t.any(`SELECT * FROM Player WHERE id=${playerID}`).then(player => {
                 if (player.length === 1) {
                     console.log('Sending player data!');
                     socket.to(gameCode).emit('new-player', playerID, null, player[0].name);
