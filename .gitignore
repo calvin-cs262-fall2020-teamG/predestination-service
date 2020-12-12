@@ -1,8 +1,12 @@
-.vscode/*
+# Node modules
 node_modules
 
-# WebStorm files
+# WebStorm & VSCode files
 .idea/*
+.vscode/*
 
 # Local heroku config vars
 .env
+
+# Expo
+.expo/*
