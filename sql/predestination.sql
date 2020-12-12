@@ -27,8 +27,8 @@ CREATE TABLE PlayerGame
 (
     gameid integer,
     playerid numeric,
-    CONSTRAINT playergame_playerid_fkey FOREIGN KEY (playerid)
-        REFERENCES  Player (id)
+    foreign key(playerid) references player(id)
+
 );
 
 CREATE TABLE Clue
