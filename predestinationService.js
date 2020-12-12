@@ -23,7 +23,7 @@ const db = pgp({
     database: process.DB_USER,
     user: process.env.DB_USER,
     password: process.env.DB_PASSWORD,
-    max: 4, // elephant sql doesn't allow more than 5, while pg-promise defaults to 10 connections
+    max: 1, // elephant sql doesn't allow more than 5, while pg-promise defaults to 10 connections
 });
 
 const initialize = async () => {
