@@ -119,7 +119,7 @@ async function deliverSnapshot(socket, gameCode, t) {
 async function addClue(gameCode, playerID, clueID, timeStamp, socket, t) {
     console.log(`Player ${playerID} found clue ${clueID}! Congratulations!`);
     try {
-	await t.none("INSERT INTO CluePlayer (ClueID, playerID, time) VALUES (${clueID}, ${playerID}, ${timeStamp})");
+	await t.none(`INSERT INTO CluePlayer (ClueID, playerID, time) VALUES (${clueID}, ${playerID}, ${timeStamp})`);
 	io.to(gameCode).emit('update', playerID, clueID, timeStamp);
     } catch (e) {
 	console.log(e);
