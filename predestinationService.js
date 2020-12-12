@@ -28,7 +28,7 @@ const db = pgp({
 const initialize = async () => {
     try {
 	db.task(t => {
-	    t.none(new QueryFile('sql/predestination.sql', {minify: true}));
+	    return t.none(new QueryFile('sql/predestination.sql', {minify: true}));
 	});
     } catch (err) {
 	console.log('Loading predestination.sql ran into an error');
